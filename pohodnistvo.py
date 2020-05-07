@@ -22,6 +22,7 @@ DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 # odkomentiraj, če želiš sporočila o napakah
 # debug(True)
 
+######################################################################
 # OSNOVNE STRANI
 
 def rtemplate(*largs, **kwargs):
@@ -46,12 +47,14 @@ def osebe():
 def gore():
     return rtemplate('gore.html')
 
+######################################################################
 # Za STATIC datoteke(slike)
 
 @get('/static/<filename:path>')
 def static(filename):
     return static_file(filename, root='static')
 
+######################################################################
 # O PROJEKTU
 
 @get('/o_projektu')
