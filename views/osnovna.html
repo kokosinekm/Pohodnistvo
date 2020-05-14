@@ -31,7 +31,9 @@
       <span class="navbar-text">
         % from datetime import date
         % danes = date.today()
-        {{danes}} je lep dan za pohodništvo!
+        % dan = danes.strftime("%d")
+        % mesec = danes.strftime("%m")
+        {{dan}}. {{mesec}} je lep dan za pohodništvo!
         %end
       </span>
     </nav>
