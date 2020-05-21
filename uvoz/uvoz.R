@@ -16,8 +16,8 @@ gore$`Date [1]`[1] <- '2000 BC'
 gore$Range[3]
 gore$Range[gore$Range == ""] <- 'osamelec'
 
-gore <- data.frame(gore$`Date [1]`, gore$Peak, gore$`Height (m)`, gore$Range, gore$Country, gore$Climbers)
-colnames(gore) <-  c('Prvi pristop', 'Ime', 'Visna', 'Gorovje', 'Drzava', 'Pohodniki')
+gore <- data.frame(gore$`Date [1]`, gore$Peak, gore$`Height (m)`, gore$Range, gore$Country)
+colnames(gore) <-  c('Prvi pristop', 'Ime', 'Visna', 'Gorovje', 'Drzava')
 write.csv(gore, "C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Gore.csv", row.names = FALSE)
 
 
@@ -51,4 +51,9 @@ drzave <- na.omit(drzave)
 drzave <- data.frame(drzave$Slovenian, drzave$`Population(2020)`, drzave$`Land Area (Km²)`)
 colnames(drzave) <-  c('Drzava', 'Populacija(2020)', 'Povrsina(Km2)')
 write.csv(drzave, "C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Drzave.csv", row.names = FALSE)
+
+#gorovja uvoz
+gorovje <- data.frame(unique(gore$Gorovje))
+colnames(gorovje) <-  c('Gorovje')
+write.csv(gorovje, "C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Gorovje.csv", row.names = FALSE)
 
