@@ -47,6 +47,22 @@ def osebe():
 def gore():
     return rtemplate('gore.html')
 
+@get('/drustva')
+def drustva():
+    return rtemplate('drustva.html')
+
+######################################################################
+# STRANI ZA DODAJANJE
+
+@get('/dodaj_goro')
+def dodaj_goro():
+    return rtemplate('dodaj_goro.html')
+
+@post('/dodaj_goro')
+def dodaj_goro_post():
+    #sql, ki bo dejansko dodal goro v tabelo
+    redirect('/gore')
+
 ######################################################################
 # Za STATIC datoteke(slike)
 
