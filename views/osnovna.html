@@ -24,11 +24,15 @@
             <a class="nav-link" href="{{ROOT}}gore">Gore</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="{{ROOT}}drustva">Društva</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{{ROOT}}o_projektu">O projektu</a>
           </li>
         </ul>
       </div>
       <span class="navbar-text">
+        <!-- Izpisovanje datuma -->
         % from datetime import date
         % danes = date.today()
         % dan = danes.strftime("%d")
