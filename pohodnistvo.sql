@@ -27,7 +27,7 @@ CREATE TABLE drzave (
 );
 
 CREATE TABLE gorovje (
-    id          INTEGER    PRIMARY KEY,
+    id          INTEGER PRIMARY KEY,
 	ime			CHAR NOT NULL
 );
 
