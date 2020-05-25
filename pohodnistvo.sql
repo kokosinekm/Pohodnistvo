@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS oseba;
 DROP TABLE IF EXISTS drustva;
 DROP TABLE IF EXISTS drzave;
-DROP TABLE IF EXISTS drustva;
-DROP TABLE IF EXISTS drustva;
+DROP TABLE IF EXISTS gore;
+DROP TABLE IF EXISTS gorovje;
 
 CREATE TABLE oseba (
     id             INTEGER    PRIMARY KEY,
@@ -27,6 +27,7 @@ CREATE TABLE drzave (
 );
 
 CREATE TABLE gorovje (
+    id          INTEGER    PRIMARY KEY,
 	ime			CHAR NOT NULL
 );
 
@@ -34,6 +35,6 @@ CREATE TABLE gore (
 	prvi_pristop		INTEGER 	NOT NULL,
 	ime					CHAR		NOT NULL,
 	visina				INTEGER		NOT NULL,
-	gorovje				CHAR REFERENCES gorovje (ime) 
+	gorovje				CHAR REFERENCES gorovje (ime),
 	drzava				CHAR REFERENCES drzave 	(ime)
 );
