@@ -6,6 +6,9 @@ from bottle import *
 import sqlite3
 import hashlib
 
+# povezava do datoteke baza
+baza_datoteka = 'pohodnistvo.db' 
+
 # uvozimo ustrezne podatke za povezavo
 # import auth_public as auth
 
@@ -43,7 +46,12 @@ def glavna_stran():
 
 @get('/osebe')
 def osebe():
-    return rtemplate('osebe.html')
+    cur = baza.cursor()
+    osebe = cur.execute("""
+    SELECT ime, priimek, spol, starost FROM oseba
+        ORDER BY oseba.priimek
+    """)
+    return rtemplate('osebe.html', osebe=osebe)
 
 @get('/gore')
 def gore():
@@ -86,6 +94,13 @@ def o_projektu():
 # conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
 # conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogočimo transakcije
 # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+######################################################################
+baza = sqlite3.connect(baza_datoteka, isolation_level=None)
+baza.set_trace_callback(print) # izpis sql stavkov v terminal (za debugiranje pri razvoju)
+# zapoved upoštevanja omejitev FOREIGN KEY
+cur = baza.cursor()
+cur.execute("PRAGMA foreign_keys = ON;")
 
 # poženemo strežnik na podanih vratih, npr. http://localhost:8080/
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER)

@@ -1,3 +1,25 @@
 %rebase('osnovna.html', naslov='Osebe')
 
 <h2>Tukaj bodo osebe...</h2>
+
+<table class="table">
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Ime</th>
+        <th scope="col">Priimek</th>
+        <th scope="col">Spol</th>
+        <th scope="col">Starost</th>
+    </tr>
+    
+    <tbody>
+        %for (ime, priimek, spol, starost) in osebe:
+        <tr>
+            <th scope="row"></th>
+            <td>{{ime}}</td>
+            <td>{{priimek}}</td>
+            <td>{{spol}}</td>
+            <td>{{starost}}</td>
+          </tr>
+        %end
+    </tbody>
+</table>
