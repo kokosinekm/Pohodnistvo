@@ -27,6 +27,7 @@ CREATE TABLE drzave (
 );
 
 CREATE TABLE gorovje (
+    id          INTEGER PRIMARY KEY,
 	ime			CHAR NOT NULL
 );
 
@@ -34,6 +35,6 @@ CREATE TABLE gore (
 	prvi_pristop		INTEGER 	NOT NULL,
 	ime					CHAR		NOT NULL,
 	visina				INTEGER		NOT NULL,
-	gorovje				CHAR REFERENCES gorovje (ime) 
+	gorovje				CHAR REFERENCES gorovje (ime),
 	drzava				CHAR REFERENCES drzave 	(ime)
 );
