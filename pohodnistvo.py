@@ -2,7 +2,9 @@
 # -*- encoding: utf-8 -*-
 
 # uvozimo bottle.py
-from bottle import get, post, run, request, template, redirect, static_file
+from bottle import *
+import sqlite3
+import hashlib
 
 # uvozimo ustrezne podatke za povezavo
 # import auth_public as auth
