@@ -59,7 +59,12 @@ def gore():
 
 @get('/drustva')
 def drustva():
-    return rtemplate('drustva.html')
+    cur = baza.cursor()
+    drustva = cur.execute("""
+    SELECT id, stevilo_clanov, ime, leto_ustanovitve  FROM drustva
+        ORDER BY drustva.ime
+    """)
+    return rtemplate('drustva.html', drustva=drustva)
 
 ######################################################################
 # STRANI ZA DODAJANJE
