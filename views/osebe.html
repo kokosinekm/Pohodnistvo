@@ -1,8 +1,9 @@
-%rebase('osnovna.html', naslov='Osebe')
+% rebase('osnovna.html', naslov='Osebe')
 
-<h2>Tukaj bodo osebe...</h2>
+<input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
+
 <div class="container-fluid">
-    <table class="table">
+    <table class="table" id='tabela'>
         <tr>
             <th scope="col">Ime</th>
             <th scope="col">Priimek</th>

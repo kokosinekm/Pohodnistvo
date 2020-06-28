@@ -7,9 +7,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="/static/ikona_gora.ico" />
   </head>
   <body>
-
     <!--Navbar-->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
       <img src="/static/ikona_gora_inverz.ico" width="30" height="30" class="d-inline-block align-top" alt="">
       <a class="navbar-brand" href="{{ROOT}}pohodnistvo">Pohodništvo</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,14 +39,34 @@
         {{dan}}.{{mesec}}. je lep dan za pohodništvo!
         %end
       </span>
-    </nav>
+    </header>
 
-    <div class="container-fluid">
-      <!-- Content here -->
-      {{!base}}
+    <div class="row flex-xl-nowrap">
+      <!-- Leva stran -->
+      <div class="col-md-3 col-xl-2 bd-sidebar">
+        Sidebar
+      </div>
+
+      <!-- Sredina -->
+      <main class="col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
+        {{!base}}
+      </main>
+
+      <!-- Desna stran-->
+      <nav class="d-none d-xl-block col-xl-2 bd-toc">
+        Desna
+      </nav>
     </div>
       
+    <footer>
+      <div class="bd-footer">
+        <p class="text-center">© 2020</p>
+      </div>
+    </footer>
   </body>
+
+  <!-- Povezava do JavaScript za iskanje po tabelah -->
+  <script src="/static/pohodnistvo.js"></script> 
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
