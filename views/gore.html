@@ -9,13 +9,15 @@
     </div>
 </form>
 
-<table class="table" id="tabela">
-    <tr>
-        <th scope="col">Ime</th>
-        <th scope="col">Višina</th>
-        <th scope="col">Gorovje</th>
-        <th scope="col">Država</th>
-    </tr>
+<table class="table table-striped" id="tabela">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Ime</th>
+            <th scope="col">Višina</th>
+            <th scope="col">Gorovje</th>
+            <th scope="col">Država</th>
+        </tr>
+    </thead>
     
     <tbody>
         %for (prvi_pristop, ime, visina, gorovje, drzava) in gore:
@@ -27,6 +29,7 @@
           </tr>
         %end
     </tbody>
+
 </table>
 
 <a href="{{ROOT}}dodaj_goro">Dodaj goro</a>

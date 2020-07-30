@@ -3,13 +3,15 @@
 <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
 
 <div class="container-fluid">
-    <table class="table" id='tabela'>
-        <tr>
-            <th scope="col">Ime</th>
-            <th scope="col">Priimek</th>
-            <th scope="col">Spol</th>
-            <th scope="col">Starost</th>
-        </tr>
+    <table class="table table-striped" id='tabela'>
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Ime</th>
+                <th scope="col">Priimek</th>
+                <th scope="col">Spol</th>
+                <th scope="col">Starost</th>
+            </tr>
+        </thead>
     
         <tbody>
             %for (ime, priimek, spol, starost) in osebe:
@@ -21,5 +23,12 @@
             </tr>
             %end
         </tbody>
+
+        <tfoot>
+            <th scope="col">Ime</th>
+            <th scope="col">Priimek</th>
+            <th scope="col">Spol</th>
+            <th scope="col">Starost</th> 
+        </tfoot>
     </table>
 </div>
