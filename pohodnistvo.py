@@ -55,7 +55,12 @@ def osebe():
 
 @get('/gore')
 def gore():
-    return rtemplate('gore.html')
+    cur = baza.cursor()
+    gore = cur.execute("""
+    SELECT prvi_pristop, ime, visina, gorovje, drzava FROM gore
+        ORDER BY gore.ime
+    """)
+    return rtemplate('gore.html', gore=gore)
 
 @get('/drustva')
 def drustva():

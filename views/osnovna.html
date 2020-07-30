@@ -41,21 +41,23 @@
       </span>
     </header>
 
-    <div class="row flex-xl-nowrap">
-      <!-- Leva stran -->
-      <div class="col-md-3 col-xl-2 bd-sidebar">
-        Sidebar
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Leva stran -->
+        <div class="col-2">
+          Prostor za vaš oglas na levi strani.
+        </div>
+
+        <!-- Sredina -->
+        <div class="col-8">
+          {{!base}}
+        </div>
+
+        <!-- Desna stran-->
+        <div class="col-2">
+          Oglas na desni strani
+        </div>
       </div>
-
-      <!-- Sredina -->
-      <main class="col-md-9 col-xl-8 py-md-3 pl-md-5 bd-content" role="main">
-        {{!base}}
-      </main>
-
-      <!-- Desna stran-->
-      <nav class="d-none d-xl-block col-xl-2 bd-toc">
-        Desna
-      </nav>
     </div>
       
     <footer>

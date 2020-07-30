@@ -4,12 +4,29 @@
 <form>
     <div class="form-row">
         <div class="col-4">
-            <input class="form-control" type="text" placeholder="Poišči goro">
-        </div>
-        <div class="col">
-            <button type="submit" class="btn btn-primary">Išči</button>
+            <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
         </div>
     </div>
 </form>
+
+<table class="table" id="tabela">
+    <tr>
+        <th scope="col">Ime</th>
+        <th scope="col">Višina</th>
+        <th scope="col">Gorovje</th>
+        <th scope="col">Država</th>
+    </tr>
+    
+    <tbody>
+        %for (prvi_pristop, ime, visina, gorovje, drzava) in gore:
+        <tr>
+            <td>{{ime}}</td>
+            <td>{{visina}}</td>
+            <td>{{gorovje}}</td>
+            <td>{{drzava}}</td>
+          </tr>
+        %end
+    </tbody>
+</table>
 
 <a href="{{ROOT}}dodaj_goro">Dodaj goro</a>
