@@ -1,6 +1,13 @@
 % rebase('osnovna.html', naslov='Osebe')
 
-<input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
+<h2>Osebe</h2>
+<form>
+    <div class="form-row">
+        <div class="col-4">
+            <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
+        </div>
+    </div>
+</form>
 
 <div class="container-fluid">
     <table class="table table-striped" id='tabela'>
@@ -24,11 +31,5 @@
             %end
         </tbody>
 
-        <tfoot>
-            <th scope="col">Ime</th>
-            <th scope="col">Priimek</th>
-            <th scope="col">Spol</th>
-            <th scope="col">Starost</th> 
-        </tfoot>
     </table>
 </div>

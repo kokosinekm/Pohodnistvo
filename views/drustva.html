@@ -1,16 +1,23 @@
 %rebase('osnovna.html', naslov='Drustva')
 
 
-<h2>Drustva</h2>
+<h2>Društva</h2>
+<form>
+    <div class="form-row">
+        <div class="col-4">
+            <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
+        </div>
+    </div>
+</form>
 
-<input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
-
-<table class="table" id="tabela">
-    <tr>
-        <th scope="col">Ime</th>
-        <th scope="col">Število Članov</th>
-        <th scope="col">Leto Ustanovitve</th>
-    </tr>
+<table class="table table-striped" id="tabela">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Ime</th>
+            <th scope="col">Število Članov</th>
+            <th scope="col">Leto Ustanovitve</th>
+        </tr>
+    </thead>
     
     <tbody>
         %for (id, stevilo_clanov, ime, leto_ustanovitve) in drustva:
