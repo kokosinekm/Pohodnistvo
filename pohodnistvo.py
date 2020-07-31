@@ -45,6 +45,13 @@ def glavna_stran():
     return rtemplate('glavna_stran.html')
 
 ######################################################################
+# PRIJAVA / REGISTRACIJA
+
+@get('/pohodnistvo/registracija')
+def registracija():
+    return rtemplate('registracija.html')
+
+######################################################################
 # OSEBE
 
 @get('/osebe')
@@ -62,6 +69,7 @@ def dodaj_osebo():
 
 @post('/dodaj_osebo')
 def dodaj_osebo_post():
+    # ce napises samo request.forms.ime pri meni ne deluje
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
     spol = request.forms.get('moski')
@@ -92,11 +100,11 @@ def dodaj_goro():
 
 @post('/dodaj_goro')
 def dodaj_goro_post():
-    ime = request.forms.ime_gore
-    visina = request.forms.visina
-    prvi_pristop = request.forms.prvi_pristop
+    ime = request.forms.get('ime_gore')
+    visina = request.forms.get('visina')
+    prvi_pristop = request.forms.get('prvi_pristop')
     cur = baza.cursor()
-    cur.execute("INSERT INTO gore (prvi_pristop, ime, visina) VALUES (?, ?, ?)", (prvi_pristop, ime, visina))
+    cur.execute("INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava) VALUES (?, ?, ?, ?, ?)", (prvi_pristop, ime, visina))
     redirect('/gore')
 
 ######################################################################

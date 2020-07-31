@@ -12,27 +12,25 @@
     </div>
 </form>
 
-<div class="container-fluid">
-    <table class="table table-striped" id='tabela'>
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">Ime</th>
-                <th scope="col">Priimek</th>
-                <th scope="col">Spol</th>
-                <th scope="col">Starost</th>
-            </tr>
-        </thead>
-    
-        <tbody>
-            %for (ime, priimek, spol, starost) in osebe:
-            <tr>
-                <td>{{ime}}</td>
-                <td>{{priimek}}</td>
-                <td>{{spol}}</td>
-                <td>{{starost}}</td>
-            </tr>
-            %end
-        </tbody>
+<table class="table table-striped" id='tabela'>
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Ime</th>
+            <th scope="col">Priimek</th>
+            <th scope="col">Spol</th>
+            <th scope="col">Starost</th>
+        </tr>
+     </thead>
 
-    </table>
-</div>
+    <tbody>
+        %for (ime, priimek, spol, starost) in osebe:
+        <tr>
+            <td>{{ime}}</td>
+            <td>{{priimek}}</td>
+            <td>{{spol}}</td>
+            <td>{{starost}}</td>
+        </tr>
+        %end
+    </tbody>
+
+</table>

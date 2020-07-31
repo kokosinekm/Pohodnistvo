@@ -31,7 +31,9 @@
 
             <div class="form-group">
                 <label for="starost">Starost</label>
-                <input id="starost" name="starost" type="int" class="form-control" placeholder="Starost...">
+                <input id="starost" name="starost" type="int" class="form-control" placeholder="Starost..." required
+                oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Obvezno polje')">>
             </div>
 
             <div class="col-4">

@@ -6,17 +6,21 @@
         <form method="post">
             <div class="form-group">
                 <label>Ime</label>
-                <input id="ime_gore" type="text" class="form-control" placeholder="Ime hribčka...">
+                <input id="ime_gore" name="ime_gore" type="text" class="form-control" placeholder="Ime hribčka..." required
+                oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Obvezno polje')">>
             </div>
 
             <div class="form-group">
                 <label>Višina</label>
-                <input id="visina" type="text" class="form-control" placeholder="Višina hribčka...">
+                <input id="visina" name="visina" type="text" class="form-control" placeholder="Višina hribčka..." required
+                oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Obvezno polje')">>
             </div>
 
             <div class="form-group">
                 <label>Prvi pristop</label>
-                <input id="prvi_pristop" type="text" class="form-control" placeholder="Prvi pristop...">
+                <input id="prvi_pristop" name="prvi_pristop" type="text" class="form-control" placeholder="Prvi pristop...">
             </div>
 
             <div class="col-4">
