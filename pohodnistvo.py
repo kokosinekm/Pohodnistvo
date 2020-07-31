@@ -44,6 +44,9 @@ def osnovna_stran():
 def glavna_stran():
     return rtemplate('glavna_stran.html')
 
+######################################################################
+# OSEBE
+
 @get('/osebe')
 def osebe():
     cur = baza.cursor()
@@ -52,6 +55,27 @@ def osebe():
         ORDER BY oseba.priimek
     """)
     return rtemplate('osebe.html', osebe=osebe)
+
+@get('/dodaj_osebo')
+def dodaj_osebo():
+    return rtemplate('dodaj_osebo.html')
+
+@post('/dodaj_osebo')
+def dodaj_osebo_post():
+    ime = request.forms.get('ime')
+    priimek = request.forms.get('priimek')
+    spol = request.forms.get('moski')
+    if spol == 'Male':
+        pass
+    else:
+        spol = 'Female'
+    starost = request.forms.get('starost')
+    cur = baza.cursor()
+    cur.execute("INSERT INTO oseba (ime, priimek, spol, starost) VALUES (?, ?, ?, ?)", (ime, priimek, spol, starost))
+    redirect('/osebe')
+
+######################################################################
+# GORE
 
 @get('/gore')
 def gore():
@@ -62,26 +86,30 @@ def gore():
     """)
     return rtemplate('gore.html', gore=gore)
 
-@get('/drustva')
-def drustva():
-    cur = baza.cursor()
-    drustva = cur.execute("""
-    SELECT id, stevilo_clanov, ime, leto_ustanovitve  FROM drustva
-        ORDER BY drustva.ime
-    """)
-    return rtemplate('drustva.html', drustva=drustva)
-
-######################################################################
-# STRANI ZA DODAJANJE
-
 @get('/dodaj_goro')
 def dodaj_goro():
     return rtemplate('dodaj_goro.html')
 
 @post('/dodaj_goro')
 def dodaj_goro_post():
-    #sql, ki bo dejansko dodal goro v tabelo
+    ime = request.forms.ime_gore
+    visina = request.forms.visina
+    prvi_pristop = request.forms.prvi_pristop
+    cur = baza.cursor()
+    cur.execute("INSERT INTO gore (prvi_pristop, ime, visina) VALUES (?, ?, ?)", (prvi_pristop, ime, visina))
     redirect('/gore')
+
+######################################################################
+# DRUSTVA
+
+@get('/drustva')
+def drustva():
+    cur = baza.cursor()
+    drustva = cur.execute("""
+    SELECT id, stevilo_clanov, ime, leto_ustanovitve FROM drustva
+        ORDER BY drustva.ime
+    """)
+    return rtemplate('drustva.html', drustva=drustva)
 
 ######################################################################
 # Za STATIC datoteke(slike)

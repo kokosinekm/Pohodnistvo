@@ -1,0 +1,45 @@
+%rebase('osnovna.html', naslov='Dodaj pohodnika')
+
+<h2>Dodaj osebo</h2>
+<div class="form-row">
+    <div class="col-4">
+        <form method="post">
+            <div class="form-group">
+                <label for="ime">Ime</label>
+                <input id="ime" name="ime" type="text" class="form-control" placeholder="Ime pohodnika..." required
+                oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Obvezno polje')"
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="priimek">Priimek</label>
+                <input id="priimek" name="priimek" type="text" class="form-control" placeholder="Priimek..." required
+                oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Obvezno polje')">
+            </div>
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="moski" id="spol" value="Male">
+                <label class="form-check-label" for="spol">Moški</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="spol" value="Female">
+                <label class="form-check-label" for="spol">Ženska</label>
+            </div>
+            
+
+            <div class="form-group">
+                <label for="starost">Starost</label>
+                <input id="starost" name="starost" type="int" class="form-control" placeholder="Starost...">
+            </div>
+
+            <div class="col-4">
+                <button type="submit" class="btn btn-primary">Dodaj</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<a href="{{ROOT}}osebe">Nazaj na osebe</a>
