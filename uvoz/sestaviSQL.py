@@ -46,7 +46,14 @@ with open(path) as csvfile:
         spol = row[3]
         starost = row[4]
 
-        f.write("insert into oseba (id, ime, priimek, spol, starost) values ("
-                + idn +",\'"+ ime +"\',\'"+ priimek +"\',\'"+ spol +"\',"+ starost +");\n") 
+        #osebe.sql dodal drustva
+        #idn = row[0][:-1]
+        #ime = row[1]
+        #priimek = row[3]
+        #spol = row[5]
+        #starost = row[6][1:-1]
+        #drustvo = row[7]
 
+        f.write("insert into oseba (id, ime, priimek, spol, starost, drustvo) values ("
+                + idn +",\'"+ ime +"\',\""+ priimek +"\",\'"+ spol +"\',"+ starost +",\'"+ drustvo +"\'"");\n")
     f.close()
