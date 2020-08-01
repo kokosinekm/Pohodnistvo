@@ -58,7 +58,7 @@ def registracija():
 def osebe():
     cur = baza.cursor()
     osebe = cur.execute("""
-    SELECT ime, priimek, spol, starost FROM oseba
+    SELECT id, ime, priimek, spol, starost FROM oseba
         ORDER BY oseba.priimek
     """)
     return rtemplate('osebe.html', osebe=osebe)
@@ -80,6 +80,17 @@ def dodaj_osebo_post():
     starost = request.forms.get('starost')
     cur = baza.cursor()
     cur.execute("INSERT INTO oseba (ime, priimek, spol, starost) VALUES (?, ?, ?, ?)", (ime, priimek, spol, starost))
+    redirect('/osebe')
+
+@get('/osebe/uredi/<id>')
+def uredi_osebo(id):
+    cur = baza.cursor()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
+    return template('oseba-edit.html', oseba=oseba, naslov="Uredi osebo")
+
+@post('/osebe/brisi/<id>')
+def brisi_osebo(id):
+    cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
     redirect('/osebe')
 
 ######################################################################

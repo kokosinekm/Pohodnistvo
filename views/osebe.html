@@ -15,20 +15,28 @@
 <table class="table table-striped" id='tabela'>
     <thead class="thead-dark">
         <tr>
-            <th scope="col">Ime</th>
-            <th scope="col">Priimek</th>
+            <th scope="col">Ime in Priimek</th>
             <th scope="col">Spol</th>
             <th scope="col">Starost</th>
+            <th scope="col">Možnosti</th>
         </tr>
      </thead>
 
     <tbody>
-        %for (ime, priimek, spol, starost) in osebe:
+        %for (id, ime, priimek, spol, starost) in osebe:
         <tr>
-            <td>{{ime}}</td>
-            <td>{{priimek}}</td>
+            <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
+            <td>{{ime + ' ' + priimek}}</td>
             <td>{{spol}}</td>
             <td>{{starost}}</td>
+            <td>
+                <form action="/osebe/uredi/{{id}}" method="get">
+                    <a href="#" onclick="this.parentElement.submit()">Uredi</a>
+                </form>
+                <form action="/osebe/brisi/{{id}}" method="post">
+                    <a href="#" onclick="this.parentElement.submit()">Briši</a>
+                </form>
+            </td>
         </tr>
         %end
     </tbody>
