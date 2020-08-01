@@ -86,7 +86,7 @@ def dodaj_osebo_post():
 def uredi_osebo(id):
     cur = baza.cursor()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
-    return template('oseba-edit.html', oseba=oseba, naslov="Uredi osebo")
+    return rtemplate('oseba-edit.html', oseba=oseba, naslov="Uredi osebo")
 
 @post('/osebe/uredi/<id>')
 def uredi_osebo_post(id):

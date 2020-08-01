@@ -1,9 +1,10 @@
 % rebase('osnovna.html', naslov='Uredi osebo')
 
 <h2>Uredi osebo</h2>
+<form action="{{'/osebe/uredi/' + str(oseba[0]) if defined('oseba') else '/osebe/dodaj_osebo'}}" method="post">
 <div class="form-row">
     <div class="col-4">
-        <form method="post">
+        
             <div class="form-group">
                 <label for="ime">Ime</label>
                 <input id="ime" name="ime" type="text" class="form-control" placeholder="{{oseba[1]}}" required
@@ -36,12 +37,13 @@
                 <label for="starost">Starost</label>
                 <input id="starost" name="starost" type="int" class="form-control" placeholder="{{oseba[4]}}" required
                 oninput="this.setCustomValidity('')"
-                oninvalid="this.setCustomValidity('To bo naša skrivnost.')">>
+                oninvalid="this.setCustomValidity('To bo naša skrivnost.')">
             </div>
 
             <div class="col-4">
                 <button type="submit" class="btn btn-primary">Potrdi</button>
             </div>
-        </form>
+        
     </div>
 </div>
+</form>
