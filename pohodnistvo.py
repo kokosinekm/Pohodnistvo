@@ -96,7 +96,7 @@ def uredi_osebo_post(id):
     starost = request.forms.get('starost')
     cur = baza.cursor()
     cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ? WHERE id = ?", 
-         (ime, priimek, spol, starost))
+        (ime, priimek, spol, starost, id))
     redirect('/osebe')
 
 

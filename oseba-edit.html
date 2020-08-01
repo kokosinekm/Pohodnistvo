@@ -4,10 +4,10 @@
 <form action="{{'/osebe/uredi/' + str(oseba[0]) if defined('oseba') else '/osebe/dodaj_osebo'}}" method="post">
 <div class="form-row">
     <div class="col-4">
-        
+
             <div class="form-group">
                 <label for="ime">Ime</label>
-                <input id="ime" name="ime" type="text" class="form-control" placeholder="{{oseba[1]}}" required
+                <input id="ime" name="ime" type="text" class="form-control" value="{{oseba[1]}}" required
                 oninput="this.setCustomValidity('')"
                 oninvalid="this.setCustomValidity('Obvezno polje')"
                 />
@@ -15,7 +15,7 @@
 
             <div class="form-group">
                 <label for="priimek">Priimek</label>
-                <input id="priimek" name="priimek" type="text" class="form-control" placeholder="{{oseba[2]}}" required
+                <input id="priimek" name="priimek" type="text" class="form-control" value="{{oseba[2]}}" required
                 oninput="this.setCustomValidity('')"
                 oninvalid="this.setCustomValidity('Obvezno polje')">
             </div>
@@ -35,7 +35,7 @@
             
             <div class="form-group">
                 <label for="starost">Starost</label>
-                <input id="starost" name="starost" type="int" class="form-control" placeholder="{{oseba[4]}}" required
+                <input id="starost" name="starost" type="int" class="form-control" value="{{oseba[4]}}" required
                 oninput="this.setCustomValidity('')"
                 oninvalid="this.setCustomValidity('To bo naša skrivnost.')">
             </div>
