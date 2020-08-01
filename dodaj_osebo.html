@@ -1,9 +1,10 @@
 %rebase('osnovna.html', naslov='Dodaj pohodnika')
 
 <h2>Dodaj osebo</h2>
+<form action="{{ '/osebe/uredi/' + oseba[0] if defined('oseba') else '/osebe/dodaj_osebo'}}" method="post">
 <div class="form-row">
     <div class="col-4">
-        <form method="post">
+        
             <div class="form-group">
                 <label for="ime">Ime</label>
                 <input id="ime" name="ime" type="text" class="form-control" placeholder="Ime pohodnika..." required
@@ -42,9 +43,10 @@
             <div class="col-4">
                 <button type="submit" class="btn btn-primary">Dodaj</button>
             </div>
-        </form>
+        
     </div>
 </div>
+</form>
 
 
 <a href="{{ROOT}}osebe">Nazaj na osebe</a>
