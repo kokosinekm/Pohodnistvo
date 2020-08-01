@@ -63,16 +63,16 @@ def osebe():
     """)
     return rtemplate('osebe.html', osebe=osebe)
 
-@get('/dodaj_osebo')
+@get('/osebe/dodaj_osebo')
 def dodaj_osebo():
     return rtemplate('dodaj_osebo.html')
 
-@post('/dodaj_osebo')
+@post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
     # ce napises samo request.forms.ime pri meni ne deluje
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
-    spol = request.forms.get('moski')
+    spol = request.forms.get('spol')
     if spol == 'Male':
         pass
     else:
