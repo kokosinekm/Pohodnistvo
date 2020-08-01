@@ -57,3 +57,26 @@ gorovje <- data.frame(unique(gore$Gorovje))
 colnames(gorovje) <-  c('Gorovje')
 write.csv(gorovje, "C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Gorovje.csv", row.names = FALSE)
 
+###########################################################################################################################################
+#uvozimo osebe in jim dodamo drustva
+
+osebe <- read.csv("C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Osebe.csv")
+osebe <- data.frame(osebe$id, osebe$Ime, osebe$Priimek, osebe$Spol, osebe$Starost) 
+colnames(osebe)<-c('id', 'Ime', 'Priimek', 'Spol', 'Starost')
+
+drustva <- read.csv("C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Drustva.csv")$id
+imena_drustev <- sapply(strsplit(as.character(drustva), '"'), `[`, 2)
+letnica_nastanka <- sapply(strsplit(as.character(drustva), '"'), `[`, 3) %>% substring(., 2) %>% as.numeric(.)
+nastanek <- data_frame('Drustvo' = imena_drustev, 'Leto ustanovitve' = letnica_nastanka
+                       )
+#razporedimo osebe po drustvih
+#ne ponavljaj!!!!
+#zato ker vzorec dolocen nakljucno
+vzorec <- sample(imena_drustev, length(osebe$id), replace = TRUE)
+osebe_nove <- bind_cols(osebe, 'Drustvo' = vzorec)
+#write.csv(osebe_nove, "C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Osebe.csv", row.names = FALSE)
+
+clani <- data_frame(osebe_nove$id, osebe_nove$Drustvo) %>% group_by(., osebe_nove$Drustvo) %>% summarise('stevilo clanov' = n())
+colnames(clani) <- c('Drustvo', 'stevilo clanov')
+drustva_nova <- left_join(nastanek, clani, by='Drustvo')
+#write.csv(drustva_nova, "C:\\Users\\komp\\Documents\\FMF\\opb\\Pohodnistvo\\Podatki\\Drustva.csv", row.names = FALSE)

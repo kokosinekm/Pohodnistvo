@@ -3,7 +3,6 @@ import csv
 path = "csv"
 path2 = "sql"
 
-
 with open(path) as csvfile:
     readCSV = csv.reader(csvfile, delimiter='"')
     next(readCSV)
