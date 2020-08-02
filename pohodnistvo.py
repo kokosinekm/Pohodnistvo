@@ -61,7 +61,7 @@ def osebe():
     SELECT id, ime, priimek, spol, starost FROM oseba
         ORDER BY oseba.priimek
     """)
-    return rtemplate('osebe.html', osebe=osebe)
+    return rtemplate('osebe.html', osebe=osebe, naslov='Pohodniki')
 
 @get('/osebe/dodaj_osebo')
 def dodaj_osebo():
@@ -105,6 +105,12 @@ def brisi_osebo(id):
     cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
     redirect('/osebe')
 
+@get('/osebe/<id>')
+def lastnosti_osebe(id):
+    cur = baza.cursor()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
+    return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
+
 ######################################################################
 # GORE
 
@@ -119,7 +125,17 @@ def gore():
 
 @get('/dodaj_goro')
 def dodaj_goro():
-    return rtemplate('dodaj_goro.html')
+    cur = baza.cursor()
+    gorovje = cur.execute("""
+    SELECT gorovje.ime FROM gorovje
+        ORDER BY gorovje.ime
+    """).fetchall()
+    drzave = cur.execute("""
+    SELECT drzave.ime FROM drzave
+        
+        ORDER BY drzave.ime
+    """).fetchall()
+    return rtemplate('dodaj_goro.html', gorovje=gorovje, drzave=drzave, naslov='Dodaj goro')
 
 @post('/dodaj_goro')
 def dodaj_goro_post():
@@ -140,7 +156,7 @@ def drustva():
     SELECT id, stevilo_clanov, ime, leto_ustanovitve FROM drustva
         ORDER BY drustva.ime
     """)
-    return rtemplate('drustva.html', drustva=drustva)
+    return rtemplate('drustva.html', drustva=drustva, naslov='Društva')
 
 ######################################################################
 # Za STATIC datoteke(slike)

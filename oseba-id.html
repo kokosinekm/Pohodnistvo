@@ -1,0 +1,23 @@
+% rebase('osnovna.html', naslov=naslov)
+
+<div class="container my-4"></div>
+
+<div class="row">
+    <div class="col-4">
+        %if oseba[3] == 'Male':
+        <img src="/static/man.png" alt='...' class="img-thumbnail">
+        %else:
+        <img src="/static/woman.png" alt='...' class="img-thumbnail">
+        %end
+    </div>
+    <div class="col-8">
+        <h2>{{oseba[1] + ' ' + oseba[2]}}</h2>
+
+        Starost: {{oseba[4]}}
+    </div>
+  </div>
+
+  <!--Tabela kje vse so že bili-->
+  <div class="row">
+
+  </div>
