@@ -9,7 +9,11 @@ CREATE TABLE oseba (
     ime            CHAR    	  NOT NULL,
     priimek        CHAR    	  NOT NULL,
     spol           CHAR    	  NOT NULL,
-    starost		   INTEGER    NOT NULL
+    starost		   INTEGER    NOT NULL,
+    drustvo        CHAR       NOT NULL,
+    uporabnik      CHAR,
+    geslo          CHAR,
+    polozaj        INTEGER
 );
 
 CREATE TABLE drustva (

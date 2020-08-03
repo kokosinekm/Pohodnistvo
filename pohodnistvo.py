@@ -25,8 +25,24 @@ ROOT = os.environ.get('BOTTLE_ROOT', '/')
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 
 # odkomentiraj, če želiš sporočila o napakah
-# debug(True)
+debug(True)
 
+######################################################################
+#ERR in druge dobrote
+@error(404)
+def napaka404(error):
+    return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2>'
+
+def nastaviSporocilo(sporocilo = None):
+    # global napakaSporocilo
+    staro = request.get_cookie("sporocilo", secret=skrivnost)
+    if sporocilo is None:
+        response.delete_cookie('sporocilo')
+    else:
+        response.set_cookie('sporocilo', sporocilo, path="/", secret=skrivnost)
+    return staro 
+
+skrivnost = "NekaVelikaDolgaSmesnaStvar"
 ######################################################################
 # OSNOVNE STRANI
 
@@ -38,7 +54,8 @@ def rtemplate(*largs, **kwargs):
 
 @get('/')
 def osnovna_stran():
-    redirect('/pohodnistvo')
+    #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
+    return rtemplate('glavna_stran.html')
 
 @get('/pohodnistvo')
 def glavna_stran():
@@ -47,9 +64,40 @@ def glavna_stran():
 ######################################################################
 # PRIJAVA / REGISTRACIJA
 
-@get('/pohodnistvo/registracija')
-def registracija():
+def hashGesla(s):
+    m = hashlib.sha256()
+    m.update(s.encode("utf-8"))
+    return m.hexdigest()
+
+@get('/registracija')
+def registracija_get():
     return rtemplate('registracija.html')
+
+@post('/registracija')
+def registracija_post():
+    identiteta = request.forms.identiteta
+    uporabnik = request.forms.uporabnik
+    geslo = request.forms.geslo
+    if identiteta is None or uporabnik is None or geslo is None:
+        redirect('/registracija')
+        return
+    cur = baza.cursor()
+    try: 
+        uporabnik = cur.execute("SELECT * FROM oseba WHERE id = ?", (identiteta, )).fetchone()
+    except:
+        uporabnik = None
+    if uporabnik is None:
+        redirect('/registracija')
+        return
+    zgostitev = hashGesla(geslo)
+    cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ? WHERE id = ?", (str(uporabnik), str(zgostitev), str(identiteta)))
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    redirect('/osebe')
+
+@get('/prijava')
+def prijava():
+    return rtemplate('prijava.html')
+
 
 ######################################################################
 # OSEBE
@@ -160,7 +208,7 @@ def o_projektu():
 # Glavni program
 
 # priklopimo se na bazo
-# conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
+# conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, geslo=auth.geslo, port=DB_PORT)
 # conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogočimo transakcije
 # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 

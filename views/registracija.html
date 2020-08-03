@@ -1,0 +1,36 @@
+%rebase('osnovna.html', naslov='Registracija')
+<form action="/registracija" method="post" autocomplete="off">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="identiteta">ID</label>
+        <input id="identiteta" name="identiteta" type="text" class="form-control" required
+          oninput="this.setCustomValidity('')"
+          oninvalid="this.setCustomValidity('Obvezno polje')"
+          />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="uporabnik">Uporabniško ime</label>
+        <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
+          oninput="this.setCustomValidity('')"
+          oninvalid="this.setCustomValidity('Obvezno polje')"
+          />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="geslo">Geslo</label>
+        <input id="geslo" name="geslo" type="password" class="form-control" required
+          oninput="this.setCustomValidity('')"
+          oninvalid="this.setCustomValidity('Obvezno polje')"
+          />
+      </div>
+    </div>
+    <div class="form-row col">
+      <button class="btn btn-primary" type="submit">
+        <b>Registracija</b>
+      </button>
+    </div>
+  
+  </form>
