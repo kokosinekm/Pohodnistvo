@@ -64,6 +64,7 @@ def glavna_stran():
 ######################################################################
 # PRIJAVA / REGISTRACIJA
 
+#zakodirajmo geslo
 def hashGesla(s):
     m = hashlib.sha256()
     m.update(s.encode("utf-8"))
@@ -75,21 +76,20 @@ def registracija_get():
 
 @post('/registracija')
 def registracija_post():
+    #poberimo vnesene podatke
     identiteta = request.forms.identiteta
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-    if identiteta is None or uporabnik is None or geslo is None:
-        redirect('/registracija')
-        return
     cur = baza.cursor()
-    try: 
-        uporabnik = cur.execute("SELECT * FROM oseba WHERE id = ?", (identiteta, )).fetchone()
-    except:
-        uporabnik = None
     if uporabnik is None:
+        #dodaj sporočilo napake
         redirect('/registracija')
         return
+    if len(geslo)<1:
+        #dodaj sporočilo napake: prekratko geslo
+        redirect('/registracija')
     zgostitev = hashGesla(geslo)
+    #brez stringa ima lahko težave s tipom podatkov
     cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ? WHERE id = ?", (str(uporabnik), str(zgostitev), str(identiteta)))
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/osebe')
@@ -97,6 +97,30 @@ def registracija_post():
 @get('/prijava')
 def prijava():
     return rtemplate('prijava.html')
+
+@post('/prijava')
+def prijava_post():
+    #poberimo vnesene podatke
+    uporabnik = request.forms.uporabnik
+    geslo = request.forms.geslo
+    cur = baza.cursor()
+    hashGeslo = None
+    try: 
+        hashGeslo = cur.execute("SELECT geslo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+        hashGeslo = hashGeslo[0]
+    except:
+        hashGeslo = None
+    if hashGeslo is None:
+        #dodaj napako, če ni gesla -> registracija?
+        redirect('/prijava')
+        return
+    if hashGesla(geslo) != hashGeslo:
+        #geslo ni pravilno
+        redirect('/prijava')
+        return
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    redirect('/osebe')
+    
 
 
 ######################################################################

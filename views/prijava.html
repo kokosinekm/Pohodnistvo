@@ -31,7 +31,7 @@
 
         <!-- Sredina -->
         <div class="col-8">
-          <form action="/pohodnistvo/registracija" target="_blank" method="POST">
+          <form action="/prijava" method="post">
             <br>
             <h2>Prijava</h2><br>
             <p>Dobrodošel na portalu Pohodništvo.</p> 
@@ -39,18 +39,18 @@
             <br> 
 
             <div class="form-group">      
-                <div class="col-4 col-offset-2">
-                    <label>Uporabniško ime</label> <br>
-                    <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
-                    oninput="this.setCustomValidity('')"
-                    oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
-                    />
-                </div>
+              <div class="col-4">
+                <label>Uporabniško ime</label> <br>
+                <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
+                oninput="this.setCustomValidity('')"
+                oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+                />
+              </div>
             </div>
             <br>
 
             <div class="form-group">
-                <div class="col-4 col-offset-2">
+                <div class="col-4">
                     <label>Geslo</label> <br>
                     <input id="geslo" name="geslo" type="password" class="form-control" required
                     oninput="this.setCustomValidity('')"
