@@ -34,13 +34,14 @@ def napaka404(error):
     return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2>'
 
 def nastaviSporocilo(sporocilo = None):
-    # global napakaSporocilo
-    staro = request.get_cookie("sporocilo", secret=skrivnost)
+    # global napaka Sporocilo
+    sporocilo = request.get_cookie("sporocilo", secret=skrivnost)
     if sporocilo is None:
         response.delete_cookie('sporocilo')
     else:
+        #path doloca za katere domene naj bo sporocilo, default je cela domena
         response.set_cookie('sporocilo', sporocilo, path="/", secret=skrivnost)
-    return staro 
+    return sporocilo
 
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
 ######################################################################
@@ -55,7 +56,7 @@ def rtemplate(*largs, **kwargs):
 @get('/')
 def osnovna_stran():
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
-    return rtemplate('glavna_stran.html')
+    return rtemplate('prijava.html')
 
 @get('/pohodnistvo')
 def glavna_stran():
@@ -81,6 +82,7 @@ def registracija_post():
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
     cur = baza.cursor()
+
     if uporabnik is None:
         #dodaj sporočilo napake
         redirect('/registracija')
@@ -88,11 +90,20 @@ def registracija_post():
     if len(geslo)<1:
         #dodaj sporočilo napake: prekratko geslo
         redirect('/registracija')
+        return
+
+    identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+    if identiteta2 != None and identiteta != identiteta2:
+        #izberi drugo uporabnisko ime
+        redirect('/registracija')
+        return
+
     zgostitev = hashGesla(geslo)
-    #brez stringa ima lahko težave s tipom podatkov
+    #brez str() ima lahko težave s tipom podatkov
     cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ? WHERE id = ?", (str(uporabnik), str(zgostitev), str(identiteta)))
+    #dolocimo osebo ki uporablja brskalnik
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/osebe')
+    redirect('/moje_drustvo')
 
 @get('/prijava')
 def prijava():
@@ -111,7 +122,7 @@ def prijava_post():
     except:
         hashGeslo = None
     if hashGeslo is None:
-        #dodaj napako, če ni gesla -> registracija?
+        #dodaj napako, če hashGeslo none potem ni registriran
         redirect('/prijava')
         return
     if hashGesla(geslo) != hashGeslo:
@@ -119,9 +130,19 @@ def prijava_post():
         redirect('/prijava')
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/osebe')
+    redirect('/moje_drustvo')
     
+######################################################################
+# DRUŠTVO
 
+@get('/moje_drustvo')
+def moje_drustvo():
+    uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
+    cur = baza.cursor()
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+    osebe = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE drustvo = ? ORDER BY oseba.priimek", (str(drustvo[0]), ))
+    print(osebe)
+    return rtemplate('moje_drustvo.html', osebe=osebe)
 
 ######################################################################
 # OSEBE
