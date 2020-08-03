@@ -13,7 +13,19 @@
     <div class="col-8">
         <h2>{{oseba[1] + ' ' + oseba[2]}}</h2>
 
-        Starost: {{oseba[4]}}
+        %if oseba[3] == 'Male':
+            <h4>Član:</h4>
+        %else:
+            <h4>Članica:</h4>
+        %end
+
+        <h4>Starost: {{oseba[4]}}</h4>
+
+        <h4>Najvišji osvojen vrh:</h4>
+
+        <h4>Število osvojenih gor:</h4>
+
+        <h4>Skupno prehojena višina:</h4>
     </div>
   </div>
 
