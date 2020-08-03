@@ -131,9 +131,14 @@ def prijava_post():
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/moje_drustvo')
+
+@get('/odjava')
+def odjava():
+    response.delete_cookie('uporabnik')
+    redirect('/prijava')
     
 ######################################################################
-# DRUŠTVO
+# DRUŠTVO in VREME
 
 @get('/moje_drustvo')
 def moje_drustvo():
