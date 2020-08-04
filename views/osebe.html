@@ -1,4 +1,4 @@
-% rebase('osnovna.html', naslov='Osebe')
+% rebase('osnovna.html', naslov=naslov)
 
 <h2>Pohodniki</h2>
 <form>
@@ -26,7 +26,11 @@
         %for (id, ime, priimek, spol, starost) in osebe:
         <tr>
             <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
-            <td>{{ime + ' ' + priimek}}</td>
+            <td>
+                <form action="/osebe/{{id}}" method="get">
+                    <a href="#" onclick="this.parentElement.submit()">{{ime + ' ' + priimek}}</a>
+                </form>
+            </td>
             <td>{{spol}}</td>
             <td>{{starost}}</td>
             <td>

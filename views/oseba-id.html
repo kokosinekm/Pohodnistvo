@@ -1,0 +1,55 @@
+% rebase('osnovna.html', naslov=naslov)
+
+<div class="container my-4"></div>
+
+<div class="row">
+    <div class="col-4">
+        %if oseba[3] == 'Male':
+        <img src="/static/man.png" alt='...' class="img-thumbnail">
+        %else:
+        <img src="/static/woman.png" alt='...' class="img-thumbnail">
+        %end
+    </div>
+    <div class="col-8">
+        <h2>{{oseba[1] + ' ' + oseba[2]}}</h2>
+
+        %if oseba[3] == 'Male':
+            <h4>Član:</h4>
+        %else:
+            <h4>Članica:</h4>
+        %end
+
+        <h4>Starost: {{oseba[4]}}</h4>
+
+        <h4>Najvišji osvojen vrh:</h4>
+
+        <h4>Število osvojenih gor:</h4>
+
+        <h4>Skupno prehojena višina:</h4>
+    </div>
+  </div>
+
+  <!--Tabela kje vse so že bili-->
+  <div class="row">
+
+    <table class="table table-striped" id="tabela">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Ime</th>
+                <th scope="col">Višina</th>
+                <th scope="col">Gorovje</th>
+                <th scope="col">Država</th>
+            </tr>
+        </thead>
+        
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+        </tbody>
+    </table>
+
+  </div>
