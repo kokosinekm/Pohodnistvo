@@ -42,3 +42,8 @@ CREATE TABLE gore (
 	gorovje				CHAR REFERENCES gorovje (ime),
 	drzava				CHAR REFERENCES drzave 	(ime)
 );
+
+CREATE TABLE obiskane(
+    ime_gore CHAR REFERENCES gore (ime),
+    uporabnik CHAR REFERENCES oseba (uporabnik)
+);

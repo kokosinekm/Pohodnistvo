@@ -280,12 +280,11 @@ def dodaj_goro():
     gorovje = cur.execute("""
     SELECT gorovje.ime FROM gorovje
         ORDER BY gorovje.ime
-    """).fetchall()
+    """).fetchall()[0]
     drzave = cur.execute("""
     SELECT drzave.ime FROM drzave
-        
         ORDER BY drzave.ime
-    """).fetchall()
+    """).fetchall()[0]
     return rtemplate('dodaj_goro.html', gorovje=gorovje, drzave=drzave, naslov='Dodaj goro')
 
 @post('/dodaj_goro')
@@ -293,8 +292,12 @@ def dodaj_goro_post():
     ime = request.forms.get('ime_gore')
     visina = request.forms.get('visina')
     prvi_pristop = request.forms.get('prvi_pristop')
+    gorovje = request.forms.get('gorovje')
+    drzava = request.forms.get('drzava')
     cur = baza.cursor()
-    cur.execute("INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava) VALUES (?, ?, ?, ?, ?)", (prvi_pristop, ime, visina))
+    cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
+        VALUES (?, ?, ?, (SELECT gorovje FROM gore WHERE ime = ?), (SELECT ime FROM drzave WHERE ime = ?))"""
+        , (prvi_pristop, ime, visina, gorovje, drzava))
     redirect('/gore')
 
 ######################################################################
