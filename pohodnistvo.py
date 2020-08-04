@@ -220,7 +220,7 @@ def dodaj_osebo_post():
 def uredi_osebo(id):
     user = dostop()
     cur = baza.cursor()
-    identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]))).fetchone()
+    identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
     if identiteta == id or int(user[1])==2:
         return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
@@ -253,7 +253,7 @@ def brisi_osebo(id):
 def lastnosti_osebe(id):
     user = dostop()
     cur = baza.cursor()
-    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]))).fetchone()
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
     if drustvo == drustvoID or int(user[1])==2:
