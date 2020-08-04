@@ -292,12 +292,16 @@ def dodaj_goro_post():
     ime = request.forms.get('ime_gore')
     visina = request.forms.get('visina')
     prvi_pristop = request.forms.get('prvi_pristop')
-    gorovje = request.forms.get('gorovje')
-    drzava = request.forms.get('drzava')
     cur = baza.cursor()
+
+    drzava = request.forms.get('drzava')
+    id_drzava = cur.execute("SELECT id FROM drzave WHERE ime = ?",(drzava,)).fetchone()
+    gorovje = request.forms.get('gorovje')
+    id_gorovje = cur.execute("SELECT id FROM gorovje WHERE ime = ?",(gorovje,)).fetchone()
+
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
-        VALUES (?, ?, ?, (SELECT gorovje FROM gore WHERE ime = ?), (SELECT ime FROM drzave WHERE ime = ?))"""
-        , (prvi_pristop, ime, visina, gorovje, drzava))
+        VALUES (?, ?, ?, ?, ?)""",
+         (int(prvi_pristop), str(ime), int(visina), str(gorovje), str(drzava)))
     redirect('/gore')
 
 ######################################################################
