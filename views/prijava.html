@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>registracija</title>
+    <title>Prijava</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -11,6 +11,7 @@
     <header class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
       <img src="/static/ikona_gora_inverz.ico" width="30" height="30" class="d-inline-block align-top" alt="">
       <a class="navbar-brand" href="/">Pohodništvo</a>
+      <div></div>
       <span class="navbar-text">
         <!-- Izpisovanje datuma -->
         % from datetime import date
@@ -31,23 +32,12 @@
 
         <!-- Sredina -->
         <div class="col-8">
-          <form action="/registracija" method="post">
+          <form action="/prijava" method="post">
             <br>
-            <h2>Registracija</h2><br>
+            <h2>Prijava</h2><br>
             <p>Dobrodošel na portalu Pohodništvo.</p> 
-            <p>Za registracijo na portal prosim vnesi <b>ID</b> in si izmisli <b>Uporabniško ime</b> in <b>Geslo</b>.</p>
+            <p> Za prijavo na portal prosim vnesi <b>Uporabniško ime</b> in <b>Geslo</b>.</p>
             <br> 
-
-            <div class="form-group">      
-              <div class="col-4">
-                <label>ID</label> <br>
-                <input id="identiteta" name="identiteta" type="text" class="form-control" required
-                oninput="this.setCustomValidity('')"
-                oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
-                />
-              </div>
-            </div>
-            <br>
 
             <div class="form-group">      
               <div class="col-4">
@@ -73,13 +63,14 @@
             
             <div>
                 <button class="btn btn-primary" type="submit">
-                  Registracija
+                  Prijava
                 </button>
             </div>
         </form>
-        <a href="\prijava", font-size:px>Si že registriran? Klikni tu.</a>
+        <a href="\registracija", font-size:px>Še nisi registriran? Klikni tu.</a>
         </div>
               
+
         <!-- Desna stran-->
         <div class="col-2 my-4">
           <img src="/static/oglas2_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">

@@ -1,0 +1,35 @@
+% rebase('osnovna.html', naslov='Osebe')
+
+<h2>Pohodniki</h2>
+<form>
+    <div class="form-row">
+        <div class="col-4">
+            <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
+        </div>
+        <div class="col-4">
+            <a href="{{ROOT}}osebe/dodaj_osebo">Dodaj pohodnika</a>
+        </div>
+    </div>
+</form>
+
+<table class="table table-striped" id='tabela'>
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Ime in Priimek</th>
+            <th scope="col">Spol</th>
+            <th scope="col">Starost</th>
+        </tr>
+     </thead>
+
+    <tbody>
+        %for (id, ime, priimek, spol, starost) in osebe:
+        <tr>
+            <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
+            <td>{{ime + ' ' + priimek}}</td>
+            <td>{{spol}}</td>
+            <td>{{starost}}</td>
+        </tr>
+        %end
+    </tbody>
+
+</table>

@@ -25,8 +25,25 @@ ROOT = os.environ.get('BOTTLE_ROOT', '/')
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 
 # odkomentiraj, če želiš sporočila o napakah
-# debug(True)
+debug(True)
 
+######################################################################
+#ERR in druge dobrote
+@error(404)
+def napaka404(error):
+    return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2>'
+
+def nastaviSporocilo(sporocilo = None):
+    # global napaka Sporocilo
+    sporocilo = request.get_cookie("sporocilo", secret=skrivnost)
+    if sporocilo is None:
+        response.delete_cookie('sporocilo')
+    else:
+        #path doloca za katere domene naj bo sporocilo, default je cela domena
+        response.set_cookie('sporocilo', sporocilo, path="/", secret=skrivnost)
+    return sporocilo
+
+skrivnost = "NekaVelikaDolgaSmesnaStvar"
 ######################################################################
 # OSNOVNE STRANI
 
@@ -38,7 +55,8 @@ def rtemplate(*largs, **kwargs):
 
 @get('/')
 def osnovna_stran():
-    redirect('/pohodnistvo')
+    #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
+    return rtemplate('prijava.html')
 
 @get('/pohodnistvo')
 def glavna_stran():
@@ -47,9 +65,89 @@ def glavna_stran():
 ######################################################################
 # PRIJAVA / REGISTRACIJA
 
-@get('/pohodnistvo/registracija')
-def registracija():
+#zakodirajmo geslo
+def hashGesla(s):
+    m = hashlib.sha256()
+    m.update(s.encode("utf-8"))
+    return m.hexdigest()
+
+@get('/registracija')
+def registracija_get():
     return rtemplate('registracija.html')
+
+@post('/registracija')
+def registracija_post():
+    #poberimo vnesene podatke
+    identiteta = request.forms.identiteta
+    uporabnik = request.forms.uporabnik
+    geslo = request.forms.geslo
+    cur = baza.cursor()
+
+    if uporabnik is None:
+        #dodaj sporočilo napake
+        redirect('/registracija')
+        return
+    if len(geslo)<1:
+        #dodaj sporočilo napake: prekratko geslo
+        redirect('/registracija')
+        return
+
+    identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+    if identiteta2 != None and identiteta != identiteta2:
+        #izberi drugo uporabnisko ime
+        redirect('/registracija')
+        return
+
+    zgostitev = hashGesla(geslo)
+    #brez str() ima lahko težave s tipom podatkov
+    cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ? WHERE id = ?", (str(uporabnik), str(zgostitev), str(identiteta)))
+    #dolocimo osebo ki uporablja brskalnik
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    redirect('/moje_drustvo')
+
+@get('/prijava')
+def prijava():
+    return rtemplate('prijava.html')
+
+@post('/prijava')
+def prijava_post():
+    #poberimo vnesene podatke
+    uporabnik = request.forms.uporabnik
+    geslo = request.forms.geslo
+    cur = baza.cursor()
+    hashGeslo = None
+    try: 
+        hashGeslo = cur.execute("SELECT geslo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+        hashGeslo = hashGeslo[0]
+    except:
+        hashGeslo = None
+    if hashGeslo is None:
+        #dodaj napako, če hashGeslo none potem ni registriran
+        redirect('/prijava')
+        return
+    if hashGesla(geslo) != hashGeslo:
+        #geslo ni pravilno
+        redirect('/prijava')
+        return
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    redirect('/moje_drustvo')
+
+@get('/odjava')
+def odjava():
+    response.delete_cookie('uporabnik')
+    redirect('/prijava')
+    
+######################################################################
+# DRUŠTVO in VREME
+
+@get('/moje_drustvo')
+def moje_drustvo():
+    uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
+    cur = baza.cursor()
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+    osebe = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE drustvo = ? ORDER BY oseba.priimek", (str(drustvo[0]), ))
+    print(osebe)
+    return rtemplate('moje_drustvo.html', osebe=osebe)
 
 ######################################################################
 # OSEBE
@@ -176,7 +274,7 @@ def o_projektu():
 # Glavni program
 
 # priklopimo se na bazo
-# conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
+# conn = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, geslo=auth.geslo, port=DB_PORT)
 # conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT) # onemogočimo transakcije
 # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
