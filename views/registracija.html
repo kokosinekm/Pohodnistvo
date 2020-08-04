@@ -27,6 +27,7 @@
             oninput="this.setCustomValidity('')"
             oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
           />
+          <small class="form-text text-muted">Naj ne bo vulgarno.</small>
       </div>
     </div>
 
@@ -38,6 +39,10 @@
             oninvalid="this.setCustomValidity('Geslo ni veljavno')"
           />
           <br>
+          <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" required>
+            <label class="form-check-label">Sem pohodnik!</label>
+          </div>
           <button class="btn btn-primary" type="submit">
             Registracija
           </button>
