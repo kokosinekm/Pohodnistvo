@@ -25,13 +25,18 @@ ROOT = os.environ.get('BOTTLE_ROOT', '/')
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 
 # odkomentiraj, če želiš sporočila o napakah
-debug(True)
+#debug(True)
 
 ######################################################################
 #ERR in druge dobrote
 @error(404)
 def napaka404(error):
     return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2>'
+
+@error(403)
+def napaka403(error):
+    return '<h1>Do te strani nimaš dostopa!</h1><a href="\moje_drustvo", font-size:px>Nazaj na začetno stran.</a>'
+
 
 def nastaviSporocilo(sporocilo = None):
     # global napaka Sporocilo
@@ -44,6 +49,15 @@ def nastaviSporocilo(sporocilo = None):
     return sporocilo
 
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
+
+def dostop():
+    uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
+    cur = baza.cursor()
+    polozaj = cur.execute("SELECT polozaj FROM oseba WHERE uporabnik=?", (uporabnik, )).fetchone()
+    if uporabnik:
+        return [uporabnik,polozaj[0]]
+    redirect('/prijava')
+
 ######################################################################
 # OSNOVNE STRANI
 
@@ -60,6 +74,7 @@ def osnovna_stran():
 
 @get('/pohodnistvo')
 def glavna_stran():
+    user = dostop()
     return rtemplate('glavna_stran.html')
 
 ######################################################################
@@ -100,7 +115,7 @@ def registracija_post():
 
     zgostitev = hashGesla(geslo)
     #brez str() ima lahko težave s tipom podatkov
-    cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ? WHERE id = ?", (str(uporabnik), str(zgostitev), str(identiteta)))
+    cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ?, polozaj = ? WHERE id = ?", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
     #dolocimo osebo ki uporablja brskalnik
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/moje_drustvo')
@@ -142,31 +157,52 @@ def odjava():
 
 @get('/moje_drustvo')
 def moje_drustvo():
-    uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
+    user = dostop()
+    uporabnik = str(user[0])
     cur = baza.cursor()
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
     osebe = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE drustvo = ? ORDER BY oseba.priimek", (str(drustvo[0]), ))
-    print(osebe)
-    return rtemplate('moje_drustvo.html', osebe=osebe)
+    polozaj = int(user[1])
+    if polozaj > 0:
+        return rtemplate('moje_drustvo_predsednik.html', osebe=osebe)
+    else:
+        return rtemplate('moje_drustvo.html', osebe=osebe)
+
+@get('/osebe/dodaj_osebo_drustvo')
+def dodaj_osebo():
+    user = dostop()
+    if int(user[1]) > 0:
+        return rtemplate('dodaj_osebo.html')
+    else:
+        return napaka403(error)
 
 ######################################################################
 # OSEBE
 
 @get('/osebe')
 def osebe():
+    user = dostop()
     cur = baza.cursor()
     osebe = cur.execute("""
     SELECT id, ime, priimek, spol, starost FROM oseba
         ORDER BY oseba.priimek
     """)
-    return rtemplate('osebe.html', osebe=osebe, naslov='Pohodniki')
+    if int(user[1]) == 2:
+        return rtemplate('osebe.html', osebe=osebe, naslov='Pohodniki')
+    else:
+        return napaka403(error)
 
 @get('/osebe/dodaj_osebo')
 def dodaj_osebo():
-    return rtemplate('dodaj_osebo.html')
+    user = dostop()
+    if int(user[1]) == 2:
+        return rtemplate('dodaj_osebo.html')
+    else:
+        return napaka403(error)
 
 @post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
+    user = dostop()
     # ce napises samo request.forms.ime pri meni ne deluje
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
@@ -182,12 +218,18 @@ def dodaj_osebo_post():
 
 @get('/osebe/uredi/<id>')
 def uredi_osebo(id):
+    user = dostop()
     cur = baza.cursor()
+    identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]))).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
-    return rtemplate('oseba-edit.html', oseba=oseba, naslov="Uredi osebo")
+    if identiteta == id or int(user[1])==2:
+        return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
+    else:
+        return napaka403(error)
 
 @post('/osebe/uredi/<id>')
 def uredi_osebo_post(id):
+    user = dostop()
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
     spol = request.forms.get('spol')
@@ -200,14 +242,24 @@ def uredi_osebo_post(id):
 
 @post('/osebe/brisi/<id>')
 def brisi_osebo(id):
-    cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
+    user = dostop()
+    if int(user[1])==2:
+        return cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
+    else:
+        return napaka403(error)
     redirect('/osebe')
 
 @get('/osebe/<id>')
 def lastnosti_osebe(id):
+    user = dostop()
     cur = baza.cursor()
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]))).fetchone()
+    drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
-    return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
+    if drustvo == drustvoID or int(user[1])==2:
+        return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
+    else:
+        return napaka403(error)
 
 ######################################################################
 # GORE
@@ -223,6 +275,7 @@ def gore():
 
 @get('/dodaj_goro')
 def dodaj_goro():
+    user = dostop()
     cur = baza.cursor()
     gorovje = cur.execute("""
     SELECT gorovje.ime FROM gorovje
@@ -249,6 +302,7 @@ def dodaj_goro_post():
 
 @get('/drustva')
 def drustva():
+    user = dostop()
     cur = baza.cursor()
     drustva = cur.execute("""
     SELECT id, stevilo_clanov, ime, leto_ustanovitve FROM drustva
@@ -256,11 +310,13 @@ def drustva():
     """)
     return rtemplate('drustva.html', drustva=drustva, naslov='Društva')
 
+
 ######################################################################
 # Za STATIC datoteke(slike)
 
 @get('/static/<filename:path>')
 def static(filename):
+    user = dostop()
     return static_file(filename, root='static')
 
 ######################################################################

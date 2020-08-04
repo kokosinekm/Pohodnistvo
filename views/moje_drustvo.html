@@ -1,13 +1,11 @@
 % rebase('osnovna.html', naslov='Osebe')
 
-<h2>Pohodniki</h2>
+<h2>Pohodniki v mojem društvu</h2>
+
 <form>
     <div class="form-row">
         <div class="col-4">
             <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
-        </div>
-        <div class="col-4">
-            <a href="{{ROOT}}osebe/dodaj_osebo">Dodaj pohodnika</a>
         </div>
     </div>
 </form>
@@ -31,5 +29,4 @@
         </tr>
         %end
     </tbody>
-
 </table>
