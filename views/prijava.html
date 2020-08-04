@@ -1,103 +1,37 @@
-<html>
-  <head>
-    <title>Prijava</title>
+%rebase('osnovna.html', naslov='naslov')
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/ikona_gora.ico" />
-  </head>
-  <body style="background-color:lightgray;">
-    <!--Navbar-->
-    <header class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-      <img src="/static/ikona_gora_inverz.ico" width="30" height="30" class="d-inline-block align-top" alt="">
-      <a class="navbar-brand" href="/">Pohodništvo</a>
-      <div></div>
-      <span class="navbar-text">
-        <!-- Izpisovanje datuma -->
-        % from datetime import date
-        % danes = date.today()
-        % dan = danes.strftime("%d")
-        % mesec = danes.strftime("%m")
-        {{dan}}.{{mesec}}. je lep dan za pohodništvo!
-        %end
-      </span>
-    </header>
-
-    <div class="container-fluid">
-      <div class="row">
-        <!-- Leva stran -->
-        <div class="col-2 my-4">
-          <img src="/static/oglas_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">
+<!-- Vsebina strani -->
+<div class="container my-5"></div>
+<div class="form d-flex justify-content-center">
+    <div class="col-5">
+        <h1>Prijava</h1><br>
+        <h3>Dobrodošel na portalu Pohodništvo.</h3> 
+        <h5> Za prijavo na portal prosim vnesi <b>Uporabniško ime</b> in <b>Geslo</b>.</h5>
+        <div class="form-group">
+          <label>Uporabniško ime</label> <br>
+          <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
+            oninput="this.setCustomValidity('')"
+            oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+          />
+            <small class="form-text text-muted">Naj ne bo vulgarno.</small>
         </div>
-
-        <!-- Sredina -->
-        <div class="col-8">
-          <form action="/prijava" method="post">
-            <br>
-            <h2>Prijava</h2><br>
-            <p>Dobrodošel na portalu Pohodništvo.</p> 
-            <p> Za prijavo na portal prosim vnesi <b>Uporabniško ime</b> in <b>Geslo</b>.</p>
-            <br> 
-
-            <div class="form-group">      
-              <div class="col-4">
-                <label>Uporabniško ime</label> <br>
-                <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
-                oninput="this.setCustomValidity('')"
-                oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
-                />
-              </div>
-            </div>
-            <br>
-
-            <div class="form-group">
-                <div class="col-4">
-                    <label>Geslo</label> <br>
-                    <input id="geslo" name="geslo" type="password" class="form-control" required
-                    oninput="this.setCustomValidity('')"
-                    oninvalid="this.setCustomValidity('Geslo ni veljavno')"
-                    />
-                </div>
-            </div>
-            <br>
-            
-            <div>
-                <button class="btn btn-primary" type="submit">
-                  Prijava
-                </button>
-            </div>
-        </form>
-        <a href="\registracija", font-size:px>Še nisi registriran? Klikni tu.</a>
+        <div class="form-group">
+            <label>Geslo</label>
+            <input id="geslo" name="geslo" type="password" class="form-control" required
+              oninput="this.setCustomValidity('')"
+              oninvalid="this.setCustomValidity('Geslo ni veljavno')"
+            />
         </div>
-              
-
-        <!-- Desna stran-->
-        <div class="col-2 my-4">
-          <img src="/static/oglas2_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">
+        <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input" required>
+            <label class="form-check-label">Sem pohodnik!</label>
         </div>
-      </div>
+        <button class="btn btn-primary" type="submit">
+          Prijava
+        </button>
     </div>
+</div>
 
-    <!--container, ki je prazen, da zamakne stran, ker drugace footer prekriva vsebino strani.-->
-    <div class="container my-4"></div>
-
-    <!--Footer-->
-    <footer class="footer bg-dark fixed-bottom">
-      <div class="container">
-        <span class="text-muted"> <p class="text-center text-white bg-dark">© 2020</p></span>
-      </div>
-    </footer>
-
-  </body>
-
-
-  <!-- Povezava do JavaScript za iskanje po tabelah -->
-  <script src="/static/pohodnistvo.js"></script> 
-
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
-</html>
+<div class="row justify-content-center">
+  <a href="\registracija", font-size:px>Še nisi registriran? Klikni tu.</a>
+</div>

@@ -70,7 +70,7 @@ def rtemplate(*largs, **kwargs):
 @get('/')
 def osnovna_stran():
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
-    return rtemplate('prijava.html')
+    return rtemplate('prijava.html', naslov='Prijava')
 
 @get('/pohodnistvo')
 def glavna_stran():
@@ -88,7 +88,7 @@ def hashGesla(s):
 
 @get('/registracija')
 def registracija_get():
-    return rtemplate('registracija.html')
+    return rtemplate('registracija.html', naslov='Registracija')
 
 @post('/registracija')
 def registracija_post():
