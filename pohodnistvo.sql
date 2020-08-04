@@ -11,7 +11,7 @@ CREATE TABLE oseba (
     priimek        CHAR    	  NOT NULL,
     spol           CHAR    	  NOT NULL,
     starost		   INTEGER    NOT NULL,
-    drustvo        CHAR       NOT NULL,
+    drustvo        CHAR       REFERENCES drustva (ime),
     uporabnik      CHAR,
     geslo          CHAR,
     polozaj        INTEGER
@@ -20,7 +20,7 @@ CREATE TABLE oseba (
 CREATE TABLE drustva (
     id             			 INTEGER    PRIMARY KEY,
     stevilo_clanov           INTEGER   	NOT NULL,
-    ime        				 CHAR       NOT NULL,
+    ime        				 CHAR       NOT NULL UNIQUE,
     leto_ustanovitve         INTEGER   	NOT NULL
 );
 
