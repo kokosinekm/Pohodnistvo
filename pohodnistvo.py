@@ -74,7 +74,7 @@ def osnovna_stran():
 @get('/pohodnistvo')
 def glavna_stran():
     user = dostop()
-    return rtemplate('glavna_stran.html')
+    return rtemplate('glavna_stran.html', naslov='Pohodništvo')
 
 ######################################################################
 # PRIJAVA / REGISTRACIJA
@@ -156,7 +156,7 @@ def prijava_post():
         redirect('/prijava')
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/moje_drustvo')
+    redirect('/pohodnistvo')
 
 @get('/odjava')
 def odjava():
