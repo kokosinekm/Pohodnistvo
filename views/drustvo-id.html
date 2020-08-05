@@ -22,6 +22,9 @@
     </div>
 </div>
 
+<!-- Container za razmak med tabelo. -->
+<div class="container my-4"></div>
+
 <!--Tabela vseh članov-->
 <div class="row">
 
@@ -36,12 +39,14 @@
         </thead>
         
         <tbody>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
+            %for (ime, priimek, spol, starost) in clani_drustva:
+                <tr>
+                    <td>{{ime}}</td>
+                    <td>{{priimek}}</td>
+                    <td>{{spol}}</td>
+                    <td>{{starost}}</td>
+                </tr>
+            %end
         </tbody>
     </table>
 

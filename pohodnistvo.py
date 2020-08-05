@@ -396,8 +396,15 @@ def drustva_id(ime):
 
     stevilo_clanov_drustvo = cur.execute("""SELECT COUNT (oseba.drustvo) FROM oseba
 	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchone()
+
+    clani_drustva = cur.execute("""SELECT * FROM oseba
+	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchall()
+
+    #naredimo list iz tuple
+    clani_drustva = [(x[1], x[2], x[3], x[4]) for x in clani_drustva]       
+
     if int(user[1]) == 2:
-        return rtemplate('drustvo-id.html', drustvo=drustvo, stevilo_clanov_drustvo=stevilo_clanov_drustvo[0], naslov='Društvo {0}'.format(ime))
+        return rtemplate('drustvo-id.html', drustvo=drustvo, stevilo_clanov_drustvo=stevilo_clanov_drustvo[0], clani_drustva=clani_drustva, naslov='Društvo {0}'.format(ime))
     else:
         return napaka403(error)
         
