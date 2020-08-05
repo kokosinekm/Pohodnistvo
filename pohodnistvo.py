@@ -38,15 +38,14 @@ def napaka403(error):
     return '<h1>Do te strani nimaš dostopa!</h1><a href="\moje_drustvo", font-size:px>Nazaj na začetno stran.</a>'
 
 
-def nastaviSporocilo(sporocilo = None):
-    # global napaka Sporocilo
-    sporocilo = request.get_cookie("sporocilo", secret=skrivnost)
-    if sporocilo is None:
-        response.delete_cookie('sporocilo')
+def javiNapaka(napaka = None):
+    napaka = request.get_cookie("napaka", secret=skrivnost)
+    if napaka is None:
+        response.delete_cookie('napaka')
     else:
-        #path doloca za katere domene naj bo sporocilo, default je cela domena
-        response.set_cookie('sporocilo', sporocilo, path="/", secret=skrivnost)
-    return sporocilo
+        #path doloca za katere domene naj bo napaka, default je cela domena
+        response.set_cookie('napaka', napaka, path="/", secret=skrivnost)
+    return napaka
 
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
 
@@ -98,18 +97,17 @@ def registracija_post():
     geslo = request.forms.geslo
     cur = baza.cursor()
 
-    if uporabnik is None:
-        #dodaj sporočilo napake
-        redirect('/registracija')
-        return
     if len(geslo)<1:
         #dodaj sporočilo napake: prekratko geslo
+        javiNapaka(napaka="geslo je prekratko")
         redirect('/registracija')
         return
 
     identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
     if identiteta2 != None and identiteta != identiteta2:
         #izberi drugo uporabnisko ime
+        print('hello')
+        javiNapaka(napaka="to uporabniško ime je zasedeno")
         redirect('/registracija')
         return
 
@@ -153,7 +151,7 @@ def odjava():
     redirect('/prijava')
     
 ######################################################################
-# DRUŠTVO in VREME
+# DRUŠTVO
 
 @get('/moje_drustvo')
 def moje_drustvo():

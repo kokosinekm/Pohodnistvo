@@ -1,15 +1,16 @@
-%rebase('osnovna.html', naslov='naslov')
+% setdefault('napaka', '')
+%rebase('osnovna.html', naslov='naslov', napaka=napaka)
 
 <!-- Vsebina strani -->
 
 <div class="col-8 ">
   <form action="/registracija" method="post">
+    <h1>napaka</h1>
     <div>
       <h1>Registracija</h1><br>
       <h3>Dobrodošel na portalu Pohodništvo.</h3> 
       <h5>Za registracijo na portal prosim vnesi <b>ID</b> in si izmisli <b>Uporabniško ime</b> in <b>Geslo</b>.</h5>
     </div>
-
     <div class="form-group">      
       <div class="col-4">
         <label>ID</label> <br>
