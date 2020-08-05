@@ -18,6 +18,7 @@
             <th scope="col">Ime in Priimek</th>
             <th scope="col">Spol</th>
             <th scope="col">Starost</th>
+            <th scope="col">Drustvo</th>
             <th scope="col">Možnosti</th>
         </tr>
      </thead>
@@ -33,6 +34,7 @@
             </td>
             <td>{{spol}}</td>
             <td>{{starost}}</td>
+            <td>{{drustvo}}</td>
             <td>
                 <form action="/osebe/uredi/{{id}}" method="get">
                     <a href="#" onclick="this.parentElement.submit()">Uredi</a>
