@@ -238,14 +238,16 @@ def dodaj_osebo_post():
 def uredi_osebo(id):
     user = dostop()
     cur = baza.cursor()
+    drustvo = cur.execute("""
+    SELECT drustva.ime FROM drustva
+        ORDER BY drustva.ime
+    """).fetchall()
+    #naredimo list iz tuple
+    drustvo = [x[0] for x in drustvo]
     identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
-    stevilo_osvojenih_gor = cur.execute("""
-        SELECT COUNT (obiskane.ime_gore) FROM obiskane
-        WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
-        """, (id, )).fetchone()
     if identiteta == id or int(user[1])==2:
-        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor, naslov="Pohodnik <id>")
+        return rtemplate('oseba-edit.html', oseba=oseba, drustvo=drustvo, naslov="Pohodnik <id>")
     else:
         return napaka403(error)
 
@@ -279,8 +281,12 @@ def lastnosti_osebe(id):
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
+    stevilo_osvojenih_gor = cur.execute("""
+        SELECT COUNT (obiskane.ime_gore) FROM obiskane
+        WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
+        """, (id, )).fetchone()
     if drustvo == drustvoID or int(user[1])==2:
-        return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
+        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0], naslov="Pohodnik <id>")
     else:
         return napaka403(error)
 
