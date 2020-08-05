@@ -40,10 +40,12 @@
             </div>
 
             <div class="form-group">
-                <label for="drustvo">Drustvo</label>
-                <input id="drustvo" name="drustvo" type="text" class="form-control" placeholder="Drustvo..." required
-                oninput="this.setCustomValidity('')"
-                oninvalid="this.setCustomValidity('Obvezno polje')">
+                <label for="drustvo">Društvo</label>
+                <select class="form-control" id="drustvo" name="drustvo" required>
+                    %for i in drustvo:
+                    <option>{{i}}</option>
+                    %end
+                </select>
             </div>
 
             <div class="col-4">

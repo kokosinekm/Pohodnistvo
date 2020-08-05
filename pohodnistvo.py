@@ -192,8 +192,14 @@ def osebe():
 @get('/osebe/dodaj_osebo')
 def dodaj_osebo():
     user = dostop()
+    drustvo = cur.execute("""
+    SELECT drustva.ime FROM drustva
+        ORDER BY drustva.ime
+    """).fetchall()
+    #naredimo list iz tuple
+    drustvo = [x[0] for x in drustvo]
     if int(user[1]) == 2:
-        return rtemplate('dodaj_osebo.html')
+        return rtemplate('dodaj_osebo.html', drustvo=drustvo)
     else:
         return napaka403(error)
 
@@ -209,8 +215,9 @@ def dodaj_osebo_post():
     else:
         spol = 'Female'
     starost = request.forms.get('starost')
+    drustvo = request.forms.get('drustvo')
     cur = baza.cursor()
-    cur.execute("INSERT INTO oseba (ime, priimek, spol, starost) VALUES (?, ?, ?, ?)", (ime, priimek, spol, starost))
+    cur.execute("INSERT INTO oseba (ime, priimek, spol, starost, drustvo) VALUES (?, ?, ?, ?, ?)", (ime, priimek, spol, starost, drustvo))
     redirect('/osebe')
 
 @get('/osebe/uredi/<id>')
@@ -218,7 +225,7 @@ def uredi_osebo(id):
     user = dostop()
     cur = baza.cursor()
     identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
-    oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     if identiteta == id or int(user[1])==2:
         return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
     else:
@@ -231,9 +238,10 @@ def uredi_osebo_post(id):
     priimek = request.forms.get('priimek')
     spol = request.forms.get('spol')
     starost = request.forms.get('starost')
+    drustvo = request.forms.get('drustvo')
     cur = baza.cursor()
-    cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ? WHERE id = ?", 
-        (ime, priimek, spol, starost, id))
+    cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ?, drustvo = ? WHERE id = ?", 
+        (ime, priimek, spol, starost, drustvo, id))
     redirect('/osebe')
 
 
@@ -241,7 +249,7 @@ def uredi_osebo_post(id):
 def brisi_osebo(id):
     user = dostop()
     if int(user[1])==2:
-        return cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
+        cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
     else:
         return napaka403(error)
     redirect('/osebe')
