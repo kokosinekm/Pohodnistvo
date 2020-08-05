@@ -45,7 +45,7 @@ CREATE TABLE gore (
 	drzava				CHAR REFERENCES drzave (ime)
 );
 
-CREATE TABLE obiskane(
+CREATE TABLE obiskane (
     ime_gore    CHAR REFERENCES gore (id),
     uporabnik   INTEGER REFERENCES oseba (id)
 );

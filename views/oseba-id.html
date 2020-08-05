@@ -26,6 +26,11 @@
         <h4>Število osvojenih gor: {{stevilo_osvojenih_gor}}</h4>
 
         <h4>Skupno prehojena višina:</h4>
+
+        <form class="col-8" action="/osebe/{{id}}/dodaj" method="get">
+            <a href="#" onclick="this.parentElement.submit()">Dodaj osvojen hrib</a>
+        </form>
+        
     </div>
   </div>
 

@@ -301,6 +301,33 @@ def lastnosti_osebe(id):
     else:
         return napaka403(error)
 
+@get('/osebe/<id>/dodaj')
+def oseba_dodaja_nov_osvojen_hrib(id):
+    user = dostop()
+    cur = baza.cursor()
+    gore = cur.execute("""
+        SELECT gore.ime FROM gore
+        ORDER BY gore.ime
+    """)
+    #naredimo list iz tuple
+    gore = [x[0] for x in gore]
+    return rtemplate('dodaj_nov_osvojen_hrib.html', gore=gore, naslov='Nov osvojen hrib')
+
+@post('/osebe/<id>/dodaj')
+def oseba_dodaja_nov_osvojen_hrib_post(id):
+    user = dostop()
+    dodana_gora = request.forms.get('dodaj_osvojen_hrib')
+
+    cur = baza.cursor()
+    #ime_gore = cur.execute("SELECT gore.ime FROM gore WHERE ime = ?",(dodana_gora,)).fetchone()
+    uporabnik = cur.execute("SELECT oseba.uporabnik FROM oseba WHERE id = ?",(id,)).fetchone()
+    if uporabnik == None:
+        return '<h1>Če oseba nima uporabniškega imena mu ne moreš dodati gore.</h1><a href="\osebe", font-size:px>Nazaj na osebe.</a>'
+    cur.execute("""INSERT INTO obiskane (ime_gore, uporabnik)
+        VALUES (?, ?)""",(str(dodana_gora), str(uporabnik)))
+    redirect('/osebe')
+
+
 ######################################################################
 # GORE
 
@@ -322,22 +349,22 @@ def dodaj_goro():
         ORDER BY gorovje.ime
     """).fetchall()
     #naredimo list iz tuple
-    gorovje_list = [x[0] for x in gorovje]
+    gorovje = [x[0] for x in gorovje]
     drzave = cur.execute("""
     SELECT drzave.ime FROM drzave
         ORDER BY drzave.ime
     """).fetchall()
-    drzave_list = [y[0] for y in drzave]
-    return rtemplate('dodaj_goro.html', gorovje=gorovje_list, drzave=drzave_list, naslov='Dodaj goro')
+    drzave = [y[0] for y in drzave]
+    return rtemplate('dodaj_goro.html', gorovje=gorovje, drzave=drzave, naslov='Dodaj goro')
 
 @post('/dodaj_goro')
 def dodaj_goro_post():
     ime = request.forms.get('ime_gore')
     visina = request.forms.get('visina')
     prvi_pristop = request.forms.get('prvi_pristop')
-    cur = baza.cursor()
-
     drzava = request.forms.get('drzava')
+
+    cur = baza.cursor()
     id_drzava = cur.execute("SELECT id FROM drzave WHERE ime = ?",(drzava,)).fetchone()
     gorovje = request.forms.get('gorovje')
     id_gorovje = cur.execute("SELECT id FROM gorovje WHERE ime = ?",(gorovje,)).fetchone()
