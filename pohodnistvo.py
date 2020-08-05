@@ -277,12 +277,15 @@ def dodaj_goro():
     gorovje = cur.execute("""
     SELECT gorovje.ime FROM gorovje
         ORDER BY gorovje.ime
-    """).fetchall()[0]
+    """).fetchall()
+    #naredimo list iz tuple
+    gorovje_list = [x[0] for x in gorovje]
     drzave = cur.execute("""
     SELECT drzave.ime FROM drzave
         ORDER BY drzave.ime
-    """).fetchall()[0]
-    return rtemplate('dodaj_goro.html', gorovje=gorovje, drzave=drzave, naslov='Dodaj goro')
+    """).fetchall()
+    drzave_list = [y[0] for y in drzave]
+    return rtemplate('dodaj_goro.html', gorovje=gorovje_list, drzave=drzave_list, naslov='Dodaj goro')
 
 @post('/dodaj_goro')
 def dodaj_goro_post():
