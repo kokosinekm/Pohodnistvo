@@ -39,13 +39,13 @@ def napaka403(error):
 
 
 def javiNapaka(napaka = None):
-    napaka = request.get_cookie("napaka", secret=skrivnost)
+    sporocilo = request.get_cookie("napaka", secret=skrivnost)
     if napaka is None:
         response.delete_cookie('napaka')
     else:
         #path doloca za katere domene naj bo napaka, default je cela domena
         response.set_cookie('napaka', napaka, path="/", secret=skrivnost)
-    return napaka
+    return sporocilo
 
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
 
@@ -87,7 +87,8 @@ def hashGesla(s):
 
 @get('/registracija')
 def registracija_get():
-    return rtemplate('registracija.html', naslov='Registracija')
+    napaka = javiNapaka()
+    return rtemplate('registracija.html', naslov='Registracija', napaka = napaka)
 
 @post('/registracija')
 def registracija_post():
@@ -96,30 +97,43 @@ def registracija_post():
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
     cur = baza.cursor()
+    iden = None
 
-    if len(geslo)<1:
-        #dodaj sporočilo napake: prekratko geslo
-        javiNapaka(napaka="to uporabniško ime je zasedeno")
+    try: 
+        iden = cur.execute("SELECT ime FROM oseba WHERE id = ?", (identiteta, )).fetchone()
+    except:
+        iden = None
+
+    if iden is None:
+        #id ne obstaja, ni član društva
+        javiNapaka(napaka="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi")
+        redirect('/registracija')
+        return
+
+    if len(geslo)<4:
+        #dolzina gesla
+        javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
         redirect('/registracija')
         return
 
     identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
     if identiteta2 != None and identiteta != identiteta2:
-        #izberi drugo uporabnisko ime
-        javiNapaka(napaka="to uporabniško ime je zasedeno")
+        #enolicnost uporabnikov
+        javiNapaka(napaka="To uporabniško ime je zasedeno")
         redirect('/registracija')
         return
 
     zgostitev = hashGesla(geslo)
     #brez str() ima lahko težave s tipom podatkov
     cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ?, polozaj = ? WHERE id = ?", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
-    #dolocimo osebo ki uporablja brskalnik
+    #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/moje_drustvo')
 
 @get('/prijava')
 def prijava():
-    return rtemplate('prijava.html', naslov='Prijava')
+    napaka = javiNapaka()
+    return rtemplate('prijava.html', naslov='Prijava', napaka=napaka)
 
 @post('/prijava')
 def prijava_post():
@@ -134,11 +148,11 @@ def prijava_post():
     except:
         hashGeslo = None
     if hashGeslo is None:
-        #dodaj napako, če hashGeslo none potem ni registriran
+        javiNapaka('Niste še registrirani')
         redirect('/prijava')
         return
     if hashGesla(geslo) != hashGeslo:
-        #geslo ni pravilno
+        javiNapaka('Geslo ni pravilno')
         redirect('/prijava')
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
