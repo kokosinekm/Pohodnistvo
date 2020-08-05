@@ -183,7 +183,7 @@ def moje_drustvo():
 def dodaj_osebo_drustvo():
     user = dostop()
     if int(user[1]) > 0:
-        return rtemplate('dodaj_osebo.html')
+        redirect('/osebe/dodaj_osebo')
     else:
         return napaka403(error)
 
