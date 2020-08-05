@@ -22,7 +22,11 @@
     <tbody>
         %for (id, stevilo_clanov, ime, leto_ustanovitve) in drustva:
         <tr>
-            <td>{{ime}}</td>
+            <td>
+                <form action="/drustva/{{ime}}" method="get">
+                    <a href="#" onclick="this.parentElement.submit()">{{ime}}</a>
+                </form>
+            </td>
             <td>{{stevilo_clanov}}</td>
             <td>{{leto_ustanovitve}}</td>
           </tr>

@@ -387,6 +387,13 @@ def drustva():
     """)
     return rtemplate('drustva.html', drustva=drustva, naslov='Društva')
 
+@get('/drustva/<ime>')
+def drustva_id(ime):
+    user = dostop()
+    cur = baza.cursor()
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
+    return rtemplate('drustvo-id.html', drustvo=drustvo, naslov='Drustvo <ime>')
+
 
 ######################################################################
 # Za STATIC datoteke(slike)
