@@ -198,4 +198,4 @@ insert into oseba (id, ime, priimek, spol, starost, drustvo) values (197,'Garret
 insert into oseba (id, ime, priimek, spol, starost, drustvo) values (198,'Matthaeus',"Duchan",'Male',54,'Walsh, Doyle and Marvin');
 insert into oseba (id, ime, priimek, spol, starost, drustvo) values (199,'Madeline',"Croizier",'Female',15,'Herman, Rath and Erdman');
 insert into oseba (id, ime, priimek, spol, starost, drustvo) values (200,'Tarrah',"Andretti",'Female',77,'Rohan-Trantow');
-insert into oseba (id, ime, priimek, spol, starost, drustvo, uporabnik, geslo, polozaj) values (420,'Kekec',"Kekec",'Male',14,'Rohan-Trantow', 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 2);
+insert into oseba (id, ime, priimek, spol, starost, drustvo, uporabnik, geslo, polozaj) values (10000000000,'Kekec',"Kekec",'Male',14,'Rohan-Trantow', 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 2);
