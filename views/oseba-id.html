@@ -21,7 +21,7 @@
 
         <h4>Starost: {{oseba[4]}}</h4>
 
-        <h4>Najvišji osvojen vrh:</h4>
+        <h4>Najvišji osvojen vrh: {{najvisji_osvojen_vrh}}</h4>
 
         <h4>Število osvojenih gor: {{stevilo_osvojenih_gor}}</h4>
 
@@ -43,12 +43,14 @@
         </thead>
         
         <tbody>
+            %for i in vse_osvojene_gore:
             <tr>
-                <td></td>
+                <td>{{i}}</td>
                 <td></td>
                 <td></td>
                 <td></td>
               </tr>
+            %end
         </tbody>
     </table>
 

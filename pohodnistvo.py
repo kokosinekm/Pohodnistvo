@@ -281,12 +281,23 @@ def lastnosti_osebe(id):
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
+    #najvisji osvojen vrh
+    #najvisji_osvojen_vrh = cur.execute("""SELECT * FROM obiskane
+    #    WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
+	#	ORDER BY obiskane.ime_gore = (SELECT visina FROM gore WHERE ime = ime_gore)
+    #    """, (id, )).fetchone()
+    #stevilo gor, na katerih je bil pohodnik
     stevilo_osvojenih_gor = cur.execute("""
         SELECT COUNT (obiskane.ime_gore) FROM obiskane
         WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
         """, (id, )).fetchone()
+    #vse gore na katerih je bil/bila
+    #vse_osvojene_gore = cur.execute("""SELECT obiskane.uporabnik FROM obiskane
+    #    WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
+	#	ORDER BY obiskane.ime_gore
+    #    """, (id, )).fetchall()
     if drustvo == drustvoID or int(user[1])==2:
-        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0], naslov="Pohodnik <id>")
+        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0], najvisji_osvojen_vrh='najvisji_osvojen_vrh[0]', vse_osvojene_gore='vse_osvojene_gore', naslov="Pohodnik <id>")
     else:
         return napaka403(error)
 
