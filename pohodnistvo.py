@@ -184,7 +184,7 @@ def osebe():
     user = dostop()
     cur = baza.cursor()
     osebe = cur.execute("""
-    SELECT id, ime, priimek, spol, starost FROM oseba
+    SELECT id, ime, priimek, spol, starost, drustvo FROM oseba
         ORDER BY oseba.priimek
     """)
     if int(user[1]) == 2:
