@@ -99,14 +99,13 @@ def registracija_post():
 
     if len(geslo)<1:
         #dodaj sporočilo napake: prekratko geslo
-        javiNapaka(napaka="geslo je prekratko")
+        javiNapaka(napaka="to uporabniško ime je zasedeno")
         redirect('/registracija')
         return
 
     identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
     if identiteta2 != None and identiteta != identiteta2:
         #izberi drugo uporabnisko ime
-        print('hello')
         javiNapaka(napaka="to uporabniško ime je zasedeno")
         redirect('/registracija')
         return
@@ -253,7 +252,7 @@ def lastnosti_osebe(id):
     cur = baza.cursor()
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
-    oseba = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE id = ?", (id,)).fetchone()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     if drustvo == drustvoID or int(user[1])==2:
         return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
     else:

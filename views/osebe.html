@@ -18,12 +18,13 @@
             <th scope="col">Ime in Priimek</th>
             <th scope="col">Spol</th>
             <th scope="col">Starost</th>
+            <th scope="col">Drustvo</th>
             <th scope="col">Možnosti</th>
         </tr>
      </thead>
 
     <tbody>
-        %for (id, ime, priimek, spol, starost) in osebe:
+        %for (id, ime, priimek, spol, starost, drustvo) in osebe:
         <tr>
             <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
             <td>
@@ -33,6 +34,7 @@
             </td>
             <td>{{spol}}</td>
             <td>{{starost}}</td>
+            <td>{{drustvo}}</td>
             <td>
                 <form action="/osebe/uredi/{{id}}" method="get">
                     <a href="#" onclick="this.parentElement.submit()">Uredi</a>
