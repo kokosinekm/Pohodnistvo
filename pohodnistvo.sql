@@ -19,7 +19,6 @@ CREATE TABLE oseba (
 
 CREATE TABLE drustva (
     id             			 INTEGER    PRIMARY KEY,
-    stevilo_clanov           INTEGER   	NOT NULL,
     ime        				 CHAR       NOT NULL UNIQUE,
     leto_ustanovitve         INTEGER   	NOT NULL
 );

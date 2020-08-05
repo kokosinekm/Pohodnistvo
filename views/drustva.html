@@ -14,20 +14,18 @@
     <thead class="thead-dark">
         <tr>
             <th scope="col">Ime</th>
-            <th scope="col">Število Članov</th>
             <th scope="col">Leto Ustanovitve</th>
         </tr>
     </thead>
     
     <tbody>
-        %for (id, stevilo_clanov, ime, leto_ustanovitve) in drustva:
+        %for (id, ime, leto_ustanovitve) in drustva:
         <tr>
             <td>
                 <form action="/drustva/{{ime}}" method="get">
                     <a href="#" onclick="this.parentElement.submit()">{{ime}}</a>
                 </form>
             </td>
-            <td>{{stevilo_clanov}}</td>
             <td>{{leto_ustanovitve}}</td>
           </tr>
         %end

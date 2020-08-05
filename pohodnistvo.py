@@ -382,7 +382,7 @@ def drustva():
     user = dostop()
     cur = baza.cursor()
     drustva = cur.execute("""
-    SELECT id, stevilo_clanov, ime, leto_ustanovitve FROM drustva
+    SELECT id, ime, leto_ustanovitve FROM drustva
         ORDER BY drustva.ime
     """)
     return rtemplate('drustva.html', drustva=drustva, naslov='Društva')
