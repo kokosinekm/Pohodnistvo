@@ -297,7 +297,7 @@ def lastnosti_osebe(id):
 	#	ORDER BY obiskane.ime_gore
     #    """, (id, )).fetchall()
     if drustvo == drustvoID or int(user[1])==2:
-        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0], najvisji_osvojen_vrh='najvisji_osvojen_vrh[0]', vse_osvojene_gore='vse_osvojene_gore', naslov="Pohodnik <id>")
+        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0], najvisji_osvojen_vrh='najvisji_osvojen_vrh[0]', vse_osvojene_gore='vse_osvojene_gore', naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]))
     else:
         return napaka403(error)
 
@@ -394,7 +394,7 @@ def drustva_id(ime):
     drustvo = cur.execute("""SELECT id, ime, leto_ustanovitve FROM drustva
         WHERE ime = ?""",(ime,)).fetchone()
     if int(user[1]) == 2:
-        return rtemplate('drustvo-id.html', drustvo=drustvo, naslov='Drustvo <ime>')
+        return rtemplate('drustvo-id.html', drustvo=drustvo, naslov='Društvo {0}'.format(ime))
     else:
         return napaka403(error)
         
