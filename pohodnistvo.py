@@ -393,8 +393,11 @@ def drustva_id(ime):
     cur = baza.cursor()
     drustvo = cur.execute("""SELECT id, ime, leto_ustanovitve FROM drustva
         WHERE ime = ?""",(ime,)).fetchone()
+
+    stevilo_clanov_drustvo = cur.execute("""SELECT COUNT (oseba.drustvo) FROM oseba
+	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchone()
     if int(user[1]) == 2:
-        return rtemplate('drustvo-id.html', drustvo=drustvo, naslov='Društvo {0}'.format(ime))
+        return rtemplate('drustvo-id.html', drustvo=drustvo, stevilo_clanov_drustvo=stevilo_clanov_drustvo[0], naslov='Društvo {0}'.format(ime))
     else:
         return napaka403(error)
         
