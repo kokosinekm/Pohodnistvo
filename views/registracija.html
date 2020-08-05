@@ -1,54 +1,54 @@
-%rebase('osnovna.html', naslov='naslov')
+%rebase('osnovna.html', naslov=naslov)
 
 <!-- Vsebina strani -->
 
-<div class="col-8 ">
-  <form action="/registracija" method="post">
-    <div>
-      <h1>Registracija</h1><br>
-      <h3>Dobrodošel na portalu Pohodništvo.</h3> 
-      <h5>Za registracijo na portal prosim vnesi <b>ID</b> in si izmisli <b>Uporabniško ime</b> in <b>Geslo</b>.</h5>
+<div class="container my-5"></div>
+
+<form class="form d-flex justify-content-center" action="/registracija" method="post">
+  <div class="col-5 justify-content-center">
+  
+    <h1>Registracija</h1><br>
+    <h3>Dobrodošel na portalu Pohodništvo.</h3> 
+    <h5>Za registracijo na portal prosim vnesi <b>ID</b> in si izmisli <b>Uporabniško ime</b> in <b>Geslo</b>.</h5>
+
+    <div class="form-group">      
+      <label>ID</label> <br>
+      <input id="identiteta" name="identiteta" type="text" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+     />
     </div>
 
     <div class="form-group">      
-      <div class="col-4">
-        <label>ID</label> <br>
-          <input id="identiteta" name="identiteta" type="text" class="form-control" required
-            oninput="this.setCustomValidity('')"
-            oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
-          />
-      </div>
-    </div>
-
-    <div class="form-group">      
-      <div class="col-4">
         <label>Uporabniško ime</label> <br>
-          <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
-            oninput="this.setCustomValidity('')"
-            oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
-          />
-          <small class="form-text text-muted">Naj ne bo vulgarno.</small>
-      </div>
+        <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
+          oninput="this.setCustomValidity('')"
+          oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        />
+        <small class="form-text text-muted">Naj ne bo vulgarno.</small>
     </div>
 
     <div class="form-group">
-      <div class="col-4">
-        <label>Geslo</label> <br>
-          <input id="geslo" name="geslo" type="password" class="form-control" required
-            oninput="this.setCustomValidity('')"
-            oninvalid="this.setCustomValidity('Geslo ni veljavno')"
-          />
-          <br>
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" required>
-            <label class="form-check-label">Sem pohodnik!</label>
-          </div>
-          <button class="btn btn-primary" type="submit">
-            Registracija
-          </button>
+      <label>Geslo</label> <br>
+      <input id="geslo" name="geslo" type="password" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Geslo ni veljavno')"
+      />
+      <br>
+
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" required>
+        <label class="form-check-label">Sem pohodnik!</label>
       </div>
+
+      <button class="btn btn-primary" type="submit">
+        Registracija
+      </button>
     </div>
-            
-  </form>
+  </div>
+</form>
+
+<div class="row justify-content-center">
   <a href="\prijava", font-size:px>Si že registriran? Klikni tu.</a>
 </div>
+
