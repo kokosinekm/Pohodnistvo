@@ -240,8 +240,12 @@ def uredi_osebo(id):
     cur = baza.cursor()
     identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
+    stevilo_osvojenih_gor = cur.execute("""
+        SELECT COUNT (obiskane.ime_gore) FROM obiskane
+        WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
+        """, (id, )).fetchone()
     if identiteta == id or int(user[1])==2:
-        return rtemplate('oseba-id.html', oseba=oseba, naslov="Pohodnik <id>")
+        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor, naslov="Pohodnik <id>")
     else:
         return napaka403(error)
 
