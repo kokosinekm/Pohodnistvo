@@ -120,7 +120,7 @@ def registracija_post():
 
 @get('/prijava')
 def prijava():
-    return rtemplate('prijava.html')
+    return rtemplate('prijava.html', naslov='Prijava')
 
 @post('/prijava')
 def prijava_post():
@@ -167,7 +167,7 @@ def moje_drustvo():
         return rtemplate('moje_drustvo.html', osebe=osebe)
 
 @get('/osebe/dodaj_osebo_drustvo')
-def dodaj_osebo():
+def dodaj_osebo_drustvo():
     user = dostop()
     if int(user[1]) > 0:
         return rtemplate('dodaj_osebo.html')
@@ -182,7 +182,7 @@ def osebe():
     user = dostop()
     cur = baza.cursor()
     osebe = cur.execute("""
-    SELECT id, ime, priimek, spol, starost FROM oseba
+    SELECT id, ime, priimek, spol, starost, drustvo FROM oseba
         ORDER BY oseba.priimek
     """)
     if int(user[1]) == 2:
@@ -321,7 +321,8 @@ def drustva():
 
 @get('/static/<filename:path>')
 def static(filename):
-    user = dostop()
+    #pomoje tukaj ne rabmo user = dostop(), ker drugace ne nalozi nobenih slik, če nisi prijavljen
+    #user = dostop()
     return static_file(filename, root='static')
 
 ######################################################################

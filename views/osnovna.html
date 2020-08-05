@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="shortcut icon" type="image/x-icon" href="/static/ikona_gora.ico" />
   </head>
+
+  <!-- Barva ozadja-->
   <body style="background-color:lightgray;">
+
     <!--Navbar-->
     <header class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
       <img src="/static/ikona_gora_inverz.ico" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -34,22 +37,20 @@
           <li class="nav-item">
             <a class="nav-link" href="http://meteo.arso.gov.si/met/sl/weather/observ/radar/" target="_blank">Vreme ARSO</a>
           </li>
-          <li class="nav-item">
+        </ul>
+      </div>
+
+      <span class="navbar-text">
+        <ul class="navbar-nav">
+          <li>
             <a class="nav-link" href="{{ROOT}}odjava"><b>Odjava</b></a>
           </li>
         </ul>
-      </div>
-      <span class="navbar-text">
-        <!-- Izpisovanje datuma -->
-        % from datetime import date
-        % danes = date.today()
-        % dan = danes.strftime("%d")
-        % mesec = danes.strftime("%m")
-        {{dan}}.{{mesec}}. je lep dan za pohodništvo!
-        %end
       </span>
+
     </header>
 
+    <!-- Vsebina strani-->
     <div class="container-fluid">
       <div class="row">
         <!-- Leva stran -->
@@ -70,7 +71,7 @@
       </div>
     </div>
 
-    <!--container, ki je prazen, da zamakne stran, ker drugace footer prekriva vsebino strani.-->
+    <!-- container, ki je prazen, da zamakne stran, ker drugace footer prekriva vsebino strani. -->
     <div class="container my-4"></div>
 
     <!--Footer-->
