@@ -10,11 +10,11 @@ import hashlib
 baza_datoteka = 'pohodnistvo.db' 
 
 # uvozimo ustrezne podatke za povezavo
-# import auth_public as auth
+import auth_public as auth
 
 # uvozimo psycopg2
-# import psycopg2, psycopg2.extensions, psycopg2.extras
-# psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
+import psycopg2, psycopg2.extensions, psycopg2.extras
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # se znebimo problemov s šumniki
 
 import os
 
@@ -23,6 +23,7 @@ SERVER_PORT = os.environ.get('BOTTLE_PORT', 8080)
 RELOADER = os.environ.get('BOTTLE_RELOADER', True)
 ROOT = os.environ.get('BOTTLE_ROOT', '/')
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
+
 
 # odkomentiraj, če želiš sporočila o napakah
 #debug(True)
@@ -179,6 +180,7 @@ def moje_drustvo():
     else:
         return rtemplate('moje_drustvo.html', osebe=osebe)
 
+
 @get('/osebe/dodaj_osebo_drustvo')
 def dodaj_osebo_drustvo():
     user = dostop()
@@ -219,7 +221,6 @@ def dodaj_osebo():
 
 @post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
-    user = dostop()
     # ce napises samo request.forms.ime pri meni ne deluje
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
@@ -234,7 +235,7 @@ def dodaj_osebo_post():
     cur.execute("INSERT INTO oseba (ime, priimek, spol, starost, drustvo) VALUES (?, ?, ?, ?, ?)", (ime, priimek, spol, starost, drustvo))
     redirect('/osebe')
 
-@get('/osebe/uredi/<id>')
+@get('/osebe/uredi/')
 def uredi_osebo(id):
     user = dostop()
     cur = baza.cursor()
@@ -242,8 +243,9 @@ def uredi_osebo(id):
     SELECT drustva.ime FROM drustva
         ORDER BY drustva.ime
     """).fetchall()
-    #naredimo list iz tuple
-    drustvo = [x[0] for x in drustvo]
+    #naredimo list iz tupla
+    drustvo = list(drustvo)
+
     identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     if identiteta == id or int(user[1])==2:
@@ -251,9 +253,8 @@ def uredi_osebo(id):
     else:
         return napaka403(error)
 
-@post('/osebe/uredi/<id>')
+@post('/osebe/uredi/')
 def uredi_osebo_post(id):
-    user = dostop()
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
     spol = request.forms.get('spol')
@@ -274,36 +275,47 @@ def brisi_osebo(id):
         return napaka403(error)
     redirect('/osebe')
 
-@get('/osebe/<id>')
-def lastnosti_osebe(id):
+@get('/osebe/posameznik')
+def lastnosti_osebe():
     user = dostop()
     cur = baza.cursor()
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
     drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
+
+    #ta ki lahko dodaja hribe v tabelo obiskani za določenega posameznika je admin in oseba sama
+    jaz = (cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone())[0]
+    lahko_dodam = ''
+    if jaz == oseba[0] or user[1]==2:
+        lahko_dodam = 'Dodaj osvojen hrib'
+    
+
     #najvisji osvojen vrh
-    #najvisji_osvojen_vrh = cur.execute("""SELECT * FROM obiskane
-    #    WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
-	#	ORDER BY obiskane.ime_gore = (SELECT visina FROM gore WHERE ime = ime_gore)
-    #    """, (id, )).fetchone()
+    najvisji_osvojen_vrh = (cur.execute("""SELECT MAX(visina), ime FROM gore WHERE 
+    id IN (SELECT id_gore FROM obiskane WHERE id_osebe = ?)""", (id,)).fetchone())
+
     #stevilo gor, na katerih je bil pohodnik
     stevilo_osvojenih_gor = cur.execute("""
-        SELECT COUNT (obiskane.ime_gore) FROM obiskane
-        WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
-        """, (id, )).fetchone()
+        SELECT COUNT(id_gore) FROM obiskane
+        WHERE id_osebe = ? """, (id, )).fetchone()
+
     #vse gore na katerih je bil/bila
-    #vse_osvojene_gore = cur.execute("""SELECT obiskane.uporabnik FROM obiskane
-    #    WHERE obiskane.uporabnik = (SELECT uporabnik FROM oseba WHERE id = ?)
-	#	ORDER BY obiskane.ime_gore
-    #    """, (id, )).fetchall()
+    #izberem zeljene podatke iz gore za nek id v ('where id in', ker 'where id =' dela samo za enega) id_gore iz obiskanih, kjer id isti kot stran 
+    vse_osvojene_gore = cur.execute("""SELECT ime, visina, gorovje, drzava FROM gore WHERE id IN (SELECT id_gore FROM obiskane
+       WHERE id_osebe = ?) ORDER BY ime""", (id, )).fetchall()
+    
+
     if drustvo == drustvoID or int(user[1])==2:
-        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0], najvisji_osvojen_vrh='najvisji_osvojen_vrh[0]', vse_osvojene_gore='vse_osvojene_gore', naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]))
+        response.set_cookie('dodaj_goro', id, path="/", secret=skrivnost) #želim prenesti id, ki mu dodajam goro (id uporabnika je lahko admin in !=)
+        return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0],
+                         najvisji_osvojen_vrh=najvisji_osvojen_vrh, vse_osvojene_gore=vse_osvojene_gore,
+                         naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]),dodaj=lahko_dodam)
     else:
         return napaka403(error)
 
 @get('/osebe/<id>/dodaj')
 def oseba_dodaja_nov_osvojen_hrib(id):
-    user = dostop()
+    dostop()
     cur = baza.cursor()
     gore = cur.execute("""
         SELECT gore.ime FROM gore
@@ -314,18 +326,15 @@ def oseba_dodaja_nov_osvojen_hrib(id):
     return rtemplate('dodaj_nov_osvojen_hrib.html', gore=gore, naslov='Nov osvojen hrib')
 
 @post('/osebe/<id>/dodaj')
-def oseba_dodaja_nov_osvojen_hrib_post(id):
-    user = dostop()
+def oseba_dodaja_nov_osvojen_hrib_post(id): #metastaza ob branju naslova funkcije
     dodana_gora = request.forms.get('dodaj_osvojen_hrib')
+    cur = baza.cursor()
+    dodana_gora = cur.execute("SELECT id FROM gore WHERE ime = ?", (str(dodana_gora),)).fetchone()
+    id_osebe = request.get_cookie('dodaj', secret=skrivnost)
 
     cur = baza.cursor()
-    #ime_gore = cur.execute("SELECT gore.ime FROM gore WHERE ime = ?",(dodana_gora,)).fetchone()
-    uporabnik = cur.execute("SELECT oseba.uporabnik FROM oseba WHERE id = ?",(id,)).fetchone()
-    if uporabnik == None:
-        return '<h1>Če oseba nima uporabniškega imena mu ne moreš dodati gore.</h1><a href="\osebe", font-size:px>Nazaj na osebe.</a>'
-    cur.execute("""INSERT INTO obiskane (ime_gore, uporabnik)
-        VALUES (?, ?)""",(str(dodana_gora), str(uporabnik)))
-    redirect('/osebe')
+    cur.execute("INSERT INTO obiskane (id_gore, id_osebe) VALUES (?, ?)",(int(dodana_gora[0]), str(id_osebe)))
+    redirect('/osebe/<id>')
 
 
 ######################################################################
@@ -365,9 +374,7 @@ def dodaj_goro_post():
     drzava = request.forms.get('drzava')
 
     cur = baza.cursor()
-    id_drzava = cur.execute("SELECT id FROM drzave WHERE ime = ?",(drzava,)).fetchone()
     gorovje = request.forms.get('gorovje')
-    id_gorovje = cur.execute("SELECT id FROM gorovje WHERE ime = ?",(gorovje,)).fetchone()
 
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
         VALUES (?, ?, ?, ?, ?)""",
@@ -433,11 +440,16 @@ def o_projektu():
 # cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 ######################################################################
+
 baza = sqlite3.connect(baza_datoteka, isolation_level=None)
 baza.set_trace_callback(print) # izpis sql stavkov v terminal (za debugiranje pri razvoju)
 # zapoved upoštevanja omejitev FOREIGN KEY
 cur = baza.cursor()
 cur.execute("PRAGMA foreign_keys = ON;")
+
+
+# priklopimo se na bazo ODKOMENTIRAJ
+#conn = psycopg2.connect(sdatabase=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
 
 # poženemo strežnik na podanih vratih, npr. http://localhost:8080/
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER)

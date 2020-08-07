@@ -23,7 +23,12 @@
         %for (id, ime, priimek, spol, starost) in osebe:
         <tr>
             <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
-            <td>{{ime + ' ' + priimek}}</td>
+            <td>
+                <form action="/osebe/posameznik" method="post">
+                    <input name="identiteta" id="identiteta" type="hidden" value="19" />
+                    <a href="#" onclick="this.parentElement.submit()">{{ime + ' ' + priimek}}</a>
+                </form>
+            </td>
             <td>{{spol}}</td>
             <td>{{starost}}</td>
         </tr>

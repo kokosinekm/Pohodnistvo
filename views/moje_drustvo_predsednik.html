@@ -27,7 +27,7 @@
         <tr>
             <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
             <td>
-                <form action="/osebe/{{id}}" method="get">
+                <form action="/osebe/posameznik" method="POST">
                     <a href="#" onclick="this.parentElement.submit()">{{ime + ' ' + priimek}}</a>
                 </form>
             </td>
