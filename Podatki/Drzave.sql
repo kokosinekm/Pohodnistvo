@@ -1,3 +1,4 @@
+insert into drzave (id, ime, populacija, povrsina) values (0,'Antarktika',0,14000000);
 insert into drzave (id, ime, populacija, povrsina) values (1,'Afganistan',38928346,652860);
 insert into drzave (id, ime, populacija, povrsina) values (2,'Albanija',2877797,27400);
 insert into drzave (id, ime, populacija, povrsina) values (3,'Alžirija',43851044,2381740);
