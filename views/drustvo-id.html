@@ -15,9 +15,13 @@
 
         <h4>Število članov: {{stevilo_clanov_drustvo}}</h4>
 
-        <h4>Najvišji osvojen vrh:</h4>
+        %if najvisja[1] is None:
+            <h4>Najvišji osvojen vrh: Društvo še ni osvojilo nobene gore</h4>
+        %else:
+            <h4>Najvišji osvojen vrh: {{najvisja[1]}} ({{najvisja[0]}}m)</h4>
+        %end
 
-        <h4>Skupno število osvojenih gora:</h4>
+        <h4>Skupno število osvojenih gora: {{vse}}</h4>
         
     </div>
 </div>

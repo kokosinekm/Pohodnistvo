@@ -167,7 +167,7 @@ def odjava():
     redirect('/prijava')
     
 ######################################################################
-# DRUŠTVO
+# MOJE DRUŠTVO
 
 @get('/moje_drustvo')
 def moje_drustvo():
@@ -419,14 +419,31 @@ def drustva_id(ime):
     stevilo_clanov_drustvo = cur.execute("""SELECT COUNT (oseba.drustvo) FROM oseba
 	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchone()
 
-    clani_drustva = cur.execute("""SELECT * FROM oseba
+    clani_drustva = cur.execute("""SELECT id, ime, priimek, spol, starost FROM oseba
 	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchall()
+
+    stevilo_vseh = 0
+    najvisja_gora = [0,None]
+    for clan in clani_drustva:
+        identiteta = clan[0]
+        #stevilo osvojenih gora za posameznika
+        osvojenih_gora = cur.execute("SELECT COUNT (id_gore) FROM obiskane WHERE id_osebe = ?",(identiteta,)).fetchone()
+        stevilo_vseh += osvojenih_gora[0]
+
+        #najvisja gora za posameznika
+        najvisji_osvojen_vrh = cur.execute("""SELECT MAX(visina), ime FROM gore WHERE 
+        id IN (SELECT id_gore FROM obiskane WHERE id_osebe = ?)""", (identiteta,)).fetchone()
+
+        if najvisji_osvojen_vrh[1] is not None and najvisji_osvojen_vrh[0] is not None:
+            if najvisja_gora[0] <= najvisji_osvojen_vrh[0]:
+                najvisja_gora = najvisji_osvojen_vrh
 
     #naredimo list iz tuple
     clani_drustva = [(x[1], x[2], x[3], x[4]) for x in clani_drustva]       
 
     if int(user[1]) == 2:
-        return rtemplate('drustvo-id.html', drustvo=drustvo, stevilo_clanov_drustvo=stevilo_clanov_drustvo[0], clani_drustva=clani_drustva, naslov='Društvo {0}'.format(ime))
+        return rtemplate('drustvo-id.html', drustvo=drustvo, stevilo_clanov_drustvo=stevilo_clanov_drustvo[0],
+                          clani_drustva=clani_drustva, naslov='Društvo {0}'.format(ime), vse = stevilo_vseh, najvisja = najvisja_gora)
     else:
         return napaka403(error)
         
