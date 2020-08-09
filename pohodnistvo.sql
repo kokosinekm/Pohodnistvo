@@ -1,47 +1,47 @@
+DROP TABLE IF EXISTS obiskane;
+DROP TABLE IF EXISTS gore;
+DROP TABLE IF EXISTS drzave;
+DROP TABLE IF EXISTS gorovje;
 DROP TABLE IF EXISTS oseba;
 DROP TABLE IF EXISTS drustva;
-DROP TABLE IF EXISTS drzave;
-DROP TABLE IF EXISTS gore;
-DROP TABLE IF EXISTS gorovje;
-DROP TABLE IF EXISTS obiskane;
-
-CREATE TABLE oseba (
-    id             INTEGER    PRIMARY KEY,
-    ime            CHAR    	  NOT NULL,
-    priimek        CHAR    	  NOT NULL,
-    spol           CHAR    	  NOT NULL,
-    starost		   INTEGER    NOT NULL,
-    drustvo        CHAR       REFERENCES drustva (ime),
-    uporabnik      CHAR,
-    geslo          CHAR,
-    polozaj        INTEGER
-);
 
 CREATE TABLE drustva (
     id             			 INTEGER    PRIMARY KEY,
-    ime        				 CHAR       NOT NULL UNIQUE,
+    ime        				 TEXT       NOT NULL UNIQUE,
     leto_ustanovitve         INTEGER   	NOT NULL
+);
+
+CREATE TABLE oseba (
+    id             INTEGER    PRIMARY KEY,
+    ime            TEXT    	  NOT NULL,
+    priimek        TEXT    	  NOT NULL,
+    spol           TEXT    	  NOT NULL,
+    starost		   INTEGER    NOT NULL,
+    drustvo        TEXT       REFERENCES drustva (ime),
+    uporabnik      TEXT,
+    geslo          TEXT,
+    polozaj        INTEGER
 );
 
 CREATE TABLE drzave (
     id             			 INTEGER    PRIMARY KEY,
-    ime        				 CHAR       NOT NULL UNIQUE,
+    ime        				 TEXT       NOT NULL UNIQUE,
 	populacija          	 INTEGER   	NOT NULL,
     povrsina		         INTEGER   	NOT NULL
 );
 
 CREATE TABLE gorovje (
     id          INTEGER PRIMARY KEY,
-	ime			CHAR    UNIQUE
+	ime			TEXT    UNIQUE
 );
 
 CREATE TABLE gore (
-    id                  INTEGER     PRIMARY KEY AUTOINCREMENT,
+    id                  SERIAL     PRIMARY KEY,
 	prvi_pristop		INTEGER 	NOT NULL,
-	ime					CHAR		NOT NULL,
+	ime					TEXT		NOT NULL,
 	visina				INTEGER		NOT NULL,
-	gorovje				CHAR REFERENCES gorovje (ime),
-	drzava				CHAR REFERENCES drzave (ime)
+	gorovje				TEXT REFERENCES gorovje (ime),
+	drzava				TEXT REFERENCES drzave (ime)
 );
 
 CREATE TABLE obiskane (
