@@ -54,7 +54,7 @@ skrivnost = "NekaVelikaDolgaSmesnaStvar"
 def dostop():
     uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
     cur = baza.cursor()
-    #povezava na bazo ne deluje, oziroma bere bazo kot prazno?
+    #povezava na bazo ne deluje, oziroma bere bazo kot prazno? HELP pls
     print(cur.execute("SELECT ime FROM oseba WHERE id = %s",(100, )).fetchone)
     if uporabnik:
         polozaj = cur.execute("SELECT polozaj FROM oseba WHERE uporabnik = %s", (uporabnik, )).fetchone()
