@@ -1,4 +1,4 @@
-#!/usr/bin/python
+sss#!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
 # uvozimo bottle.py
