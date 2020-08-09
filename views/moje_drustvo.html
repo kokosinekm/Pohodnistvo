@@ -16,6 +16,9 @@
             <th scope="col">Ime in Priimek</th>
             <th scope="col">Spol</th>
             <th scope="col">Starost</th>
+            %if polozaj == 2:
+                <th scope="col">Možnosti</th>
+            %end
         </tr>
      </thead>
 
@@ -24,13 +27,22 @@
         <tr>
             <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
             <td>
-                <form action="/osebe/posameznik" method="post">
-                    <input name="identiteta" id="identiteta" type="hidden" value="19" />
+                <form action="/osebe/{{id}}" method="get">
                     <a href="#" onclick="this.parentElement.submit()">{{ime + ' ' + priimek}}</a>
                 </form>
             </td>
             <td>{{spol}}</td>
             <td>{{starost}}</td>
+            %if polozaj == 2:
+                <td>
+                    <form action="/osebe/uredi/{{id}}" method="get">
+                        <a href="#" onclick="this.parentElement.submit()">Uredi</a>
+                    </form>
+                    <form action="/osebe/brisi/{{id}}" method="post">
+                        <a href="#" onclick="this.parentElement.submit()">Briši</a>
+                    </form>
+                </td>
+            %end
         </tr>
         %end
     </tbody>

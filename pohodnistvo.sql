@@ -45,6 +45,7 @@ CREATE TABLE gore (
 );
 
 CREATE TABLE obiskane (
-    id_gore    INTEGER REFERENCES gore (id),
-    id_osebe   INTEGER REFERENCES oseba (id)
+    id_gore         INTEGER REFERENCES gore (id),
+    id_osebe        INTEGER REFERENCES oseba (id),
+    leto_pristopa   INTEGER
 );

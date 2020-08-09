@@ -5,6 +5,7 @@
 from bottle import *
 import sqlite3
 import hashlib
+import datetime
 
 # povezava do datoteke baza
 baza_datoteka = 'pohodnistvo.db' 
@@ -32,11 +33,11 @@ DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 #ERR in druge dobrote
 @error(404)
 def napaka404(error):
-    return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2>'
+    return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2><a href="/pohodnistvo", font-size:px>Nazaj na začetno stran.</a>'
 
 @error(403)
 def napaka403(error):
-    return '<h1>Do te strani nimaš dostopa!</h1><a href="\moje_drustvo", font-size:px>Nazaj na začetno stran.</a>'
+    return '<h1>Do te strani nimaš dostopa!</h1><a href="/pohodnistvo", font-size:px>Nazaj na začetno stran.</a>'
 
 
 def javiNapaka(napaka = None):
@@ -74,7 +75,7 @@ def osnovna_stran():
 
 @get('/pohodnistvo')
 def glavna_stran():
-    user = dostop()
+    dostop()
     return rtemplate('glavna_stran.html', naslov='Pohodništvo')
 
 ######################################################################
@@ -129,7 +130,7 @@ def registracija_post():
     cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ?, polozaj = ? WHERE id = ?", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
     #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/moje_drustvo')
+    redirect('/pohodnistvo')
 
 @get('/prijava')
 def prijava():
@@ -162,6 +163,7 @@ def prijava_post():
 @get('/odjava')
 def odjava():
     response.delete_cookie('uporabnik')
+    response.delete_cookie('identiteta')
     redirect('/prijava')
     
 ######################################################################
@@ -175,10 +177,7 @@ def moje_drustvo():
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
     osebe = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE drustvo = ? ORDER BY oseba.priimek", (str(drustvo[0]), ))
     polozaj = int(user[1])
-    if polozaj > 0:
-        return rtemplate('moje_drustvo_predsednik.html', osebe=osebe)
-    else:
-        return rtemplate('moje_drustvo.html', osebe=osebe)
+    return rtemplate('moje_drustvo.html', osebe=osebe, polozaj = polozaj)
 
 
 @get('/osebe/dodaj_osebo_drustvo')
@@ -235,8 +234,8 @@ def dodaj_osebo_post():
     cur.execute("INSERT INTO oseba (ime, priimek, spol, starost, drustvo) VALUES (?, ?, ?, ?, ?)", (ime, priimek, spol, starost, drustvo))
     redirect('/osebe')
 
-@get('/osebe/uredi/')
-def uredi_osebo(id):
+@get('/osebe/uredi/<identiteta>')
+def uredi_osebo(identiteta):
     user = dostop()
     cur = baza.cursor()
     drustvo = cur.execute("""
@@ -247,14 +246,14 @@ def uredi_osebo(id):
     drustvo = list(drustvo)
 
     identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
-    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
-    if identiteta == id or int(user[1])==2:
-        return rtemplate('oseba-edit.html', oseba=oseba, drustvo=drustvo, naslov="Pohodnik <id>")
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
+    if identiteta == identiteta or int(user[1])==2:
+        return rtemplate('oseba-edit.html', oseba=oseba, drustvo=drustvo, naslov="Pohodnik <identiteta>")
     else:
         return napaka403(error)
 
-@post('/osebe/uredi/')
-def uredi_osebo_post(id):
+@post('/osebe/uredi/<identiteta>')
+def uredi_osebo_post(identiteta):
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
     spol = request.forms.get('spol')
@@ -262,79 +261,95 @@ def uredi_osebo_post(id):
     drustvo = request.forms.get('drustvo')
     cur = baza.cursor()
     cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ?, drustvo = ? WHERE id = ?", 
-        (ime, priimek, spol, starost, drustvo, id))
+        (ime, priimek, spol, starost, drustvo, identiteta))
     redirect('/osebe')
 
 
-@post('/osebe/brisi/<id>')
-def brisi_osebo(id):
+@post('/osebe/brisi/<identiteta>')
+def brisi_osebo(identiteta):
     user = dostop()
     if int(user[1])==2:
-        cur.execute("DELETE FROM oseba WHERE id = ?", (id, ))
+        cur.execute("DELETE FROM oseba WHERE id = ?", (identiteta, ))
     else:
         return napaka403(error)
     redirect('/osebe')
 
-@get('/osebe/posameznik')
-def lastnosti_osebe():
+@get('/osebe/<identiteta>')
+def lastnosti_osebe(identiteta):
     user = dostop()
+    #dolocim identiteto osebe, kjer bom brskal (admin ni nujno enak identiteti kjer ureja)
+    response.set_cookie('identiteta',identiteta,secret=skrivnost)
+
     cur = baza.cursor()
     drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
-    drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
-    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (id,)).fetchone()
+    drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
 
     #ta ki lahko dodaja hribe v tabelo obiskani za določenega posameznika je admin in oseba sama
     jaz = (cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone())[0]
-    lahko_dodam = ''
-    if jaz == oseba[0] or user[1]==2:
-        lahko_dodam = 'Dodaj osvojen hrib'
-    
+    #to preverim s spremenljivko dodaj, ki je true kadar lahko dodam
+    dodaj = False
+    if jaz == identiteta or user[1]==2:
+        dodaj = True
 
     #najvisji osvojen vrh
     najvisji_osvojen_vrh = (cur.execute("""SELECT MAX(visina), ime FROM gore WHERE 
-    id IN (SELECT id_gore FROM obiskane WHERE id_osebe = ?)""", (id,)).fetchone())
+    id IN (SELECT id_gore FROM obiskane WHERE id_osebe = ?)""", (identiteta,)).fetchone())
 
     #stevilo gor, na katerih je bil pohodnik
     stevilo_osvojenih_gor = cur.execute("""
         SELECT COUNT(id_gore) FROM obiskane
-        WHERE id_osebe = ? """, (id, )).fetchone()
+        WHERE id_osebe = ? """, (identiteta, )).fetchone()
 
     #vse gore na katerih je bil/bila
-    #izberem zeljene podatke iz gore za nek id v ('where id in', ker 'where id =' dela samo za enega) id_gore iz obiskanih, kjer id isti kot stran 
-    vse_osvojene_gore = cur.execute("""SELECT ime, visina, gorovje, drzava FROM gore WHERE id IN (SELECT id_gore FROM obiskane
-       WHERE id_osebe = ?) ORDER BY ime""", (id, )).fetchall()
-    
+    #izberem zeljene podatke iz gore za nek id v
+    # ('where id in', ker 'where id =' dela samo za enega) id_gore iz obiskanih, kjer id isti kot stran 
+    vse_osvojene_gore = cur.execute("""SELECT ime, visina, gorovje, drzava FROM gore 
+        WHERE id IN (SELECT id_gore FROM obiskane
+        WHERE id_osebe = ?) ORDER BY ime""", (identiteta, )).fetchall()
 
     if drustvo == drustvoID or int(user[1])==2:
-        response.set_cookie('dodaj_goro', id, path="/", secret=skrivnost) #želim prenesti id, ki mu dodajam goro (id uporabnika je lahko admin in !=)
         return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0],
                          najvisji_osvojen_vrh=najvisji_osvojen_vrh, vse_osvojene_gore=vse_osvojene_gore,
-                         naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]),dodaj=lahko_dodam)
+                         naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]), identiteta=identiteta, dodaj=dodaj)
     else:
         return napaka403(error)
 
-@get('/osebe/<id>/dodaj')
-def oseba_dodaja_nov_osvojen_hrib(id):
+@get('/osebe/dodaj goro')
+def osvojena_gora():
     dostop()
     cur = baza.cursor()
-    gore = cur.execute("""
-        SELECT gore.ime FROM gore
-        ORDER BY gore.ime
-    """)
-    #naredimo list iz tuple
-    gore = [x[0] for x in gore]
-    return rtemplate('dodaj_nov_osvojen_hrib.html', gore=gore, naslov='Nov osvojen hrib')
+    gore = cur.execute("""SELECT id, prvi_pristop, ime, visina, gorovje, drzava FROM gore ORDER BY gore.ime""")
+    return rtemplate('dodaj_osvojeno_goro.html', gore=gore, naslov='Nov osvojen hrib')
 
-@post('/osebe/<id>/dodaj')
-def oseba_dodaja_nov_osvojen_hrib_post(id): #metastaza ob branju naslova funkcije
-    dodana_gora = request.forms.get('dodaj_osvojen_hrib')
+@post('/osebe/dodaj goro')
+def osvojena_gora_post():
     cur = baza.cursor()
-    dodana_gora = cur.execute("SELECT id FROM gore WHERE ime = ?", (str(dodana_gora),)).fetchone()
-    id_osebe = request.get_cookie('dodaj', secret=skrivnost)
+    #seznam gora
+    gore = list(cur.execute("SELECT id FROM gore"))
 
-    cur = baza.cursor()
-    cur.execute("INSERT INTO obiskane (id_gore, id_osebe) VALUES (?, ?)",(int(dodana_gora[0]), str(id_osebe)))
-    redirect('/osebe/<id>')
+    #osvojene gore
+    identiteta = request.get_cookie('identiteta', secret=skrivnost)
+    prej_osvojene = cur.execute("SELECT id_gore FROM obiskane WHERE id_osebe = ?",(identiteta,)).fetchall()
+    osvojene = []
+    #cursor nam vrne seznam tuplov [(int,), ...]
+    for i in prej_osvojene: 
+        osvojene.append(i[0])
+    
+    for i in gore:
+        #element gore je tuple oblike (integer,)
+        i=i[0]
+        #zapeljem se čez vse gore in pogledam, če je že osvojen
+        j = request.forms.get(str(i))
+        if j and int(j) not in osvojene:
+            osvojene.append(j)
+    
+    #sčistim bazo že osvojenih za naš id in dodam osvojene in leto
+    time = datetime.datetime.now()
+    cur.execute("DELETE FROM obiskane WHERE id_osebe = ?", (identiteta, ))
+    for gora in osvojene:
+        cur.execute("INSERT INTO obiskane (id_gore, id_osebe, leto_pristopa) VALUES (?, ?, ?)",(gora, str(identiteta), int(time.year)))
+    redirect('/osebe/'+str(identiteta))
 
 
 ######################################################################
@@ -349,9 +364,9 @@ def gore():
     """)
     return rtemplate('gore.html', gore=gore)
 
-@get('/dodaj_goro')
+@get('/gore/dodaj goro')
 def dodaj_goro():
-    user = dostop()
+    dostop()
     cur = baza.cursor()
     gorovje = cur.execute("""
     SELECT gorovje.ime FROM gorovje
@@ -366,7 +381,7 @@ def dodaj_goro():
     drzave = [y[0] for y in drzave]
     return rtemplate('dodaj_goro.html', gorovje=gorovje, drzave=drzave, naslov='Dodaj goro')
 
-@post('/dodaj_goro')
+@post('/gore/dodaj goro')
 def dodaj_goro_post():
     ime = request.forms.get('ime_gore')
     visina = request.forms.get('visina')
