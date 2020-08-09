@@ -8,7 +8,7 @@ import hashlib
 import datetime
 
 # povezava do datoteke baza
-baza_datoteka = 'pohodnistvo.db' 
+#baza_datoteka = 'pohodnistvo.db' 
 
 # uvozimo ustrezne podatke za povezavo
 import auth_public as auth
@@ -54,8 +54,10 @@ skrivnost = "NekaVelikaDolgaSmesnaStvar"
 def dostop():
     uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
     cur = baza.cursor()
-    polozaj = cur.execute("SELECT polozaj FROM oseba WHERE uporabnik=?", (uporabnik, )).fetchone()
+    #povezava na bazo ne deluje, oziroma bere bazo kot prazno?
+    print(cur.execute("SELECT ime FROM oseba WHERE id = %s",(100, )).fetchone)
     if uporabnik:
+        polozaj = cur.execute("SELECT polozaj FROM oseba WHERE uporabnik = %s", (uporabnik, )).fetchone()
         return [uporabnik,polozaj[0]]
     redirect('/prijava')
 
@@ -107,7 +109,7 @@ def registracija_post():
     iden = None
 
     try: 
-        iden = cur.execute("SELECT ime FROM oseba WHERE id = ?", (identiteta, )).fetchone()
+        iden = cur.execute("SELECT ime FROM oseba WHERE id = %s", (identiteta, )).fetchone()
     except:
         iden = None
 
@@ -123,7 +125,7 @@ def registracija_post():
         redirect('/registracija')
         return
 
-    identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+    identiteta2 = cur.execute("SELECT id FROM oseba WHERE uporabnik = %s", (uporabnik, )).fetchone()
     if identiteta2 != None and identiteta != identiteta2:
         #enolicnost uporabnikov
         javiNapaka(napaka="To uporabniško ime je zasedeno")
@@ -132,7 +134,7 @@ def registracija_post():
 
     zgostitev = hashGesla(geslo)
     #brez str() ima lahko težave s tipom podatkov
-    cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ?, polozaj = ? WHERE id = ?", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
+    cur.execute("UPDATE oseba SET uporabnik = %s, geslo = %s, polozaj = %s WHERE id = %s", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
     #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/pohodnistvo')
@@ -150,7 +152,7 @@ def prijava_post():
     cur = baza.cursor()
     hashGeslo = None
     try: 
-        hashGeslo = cur.execute("SELECT geslo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
+        hashGeslo = cur.execute("SELECT geslo FROM oseba WHERE uporabnik = %s", (uporabnik, )).fetchone()
         hashGeslo = hashGeslo[0]
     except:
         hashGeslo = None
@@ -179,8 +181,8 @@ def moje_drustvo():
     user = dostop()
     uporabnik = str(user[0])
     cur = baza.cursor()
-    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (uporabnik, )).fetchone()
-    osebe = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE drustvo = ? ORDER BY oseba.priimek", (str(drustvo[0]), ))
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = %s", (uporabnik, )).fetchone()
+    osebe = cur.execute("SELECT id, ime, priimek, spol, starost FROM oseba WHERE drustvo = %s ORDER BY oseba.priimek", (str(drustvo[0]), ))
     polozaj = int(user[1])
     return rtemplate('moje_drustvo.html', osebe=osebe, polozaj = polozaj)
 
@@ -236,7 +238,7 @@ def dodaj_osebo_post():
     starost = request.forms.get('starost')
     drustvo = request.forms.get('drustvo')
     cur = baza.cursor()
-    cur.execute("INSERT INTO oseba (ime, priimek, spol, starost, drustvo) VALUES (?, ?, ?, ?, ?)", (ime, priimek, spol, starost, drustvo))
+    cur.execute("INSERT INTO oseba (ime, priimek, spol, starost, drustvo) VALUES (%s, %s, %s, %s, %s)", (ime, priimek, spol, starost, drustvo))
     redirect('/osebe')
 
 @get('/osebe/uredi/<identiteta>')
@@ -248,11 +250,11 @@ def uredi_osebo(identiteta):
     #naredimo list iz tupla
     drustvo = list(drustvo)
     #bomo dali v naslov tab-a
-    ime = cur.execute("SELECT ime, priimek FROM oseba WHERE id = ?", (str(identiteta),)).fetchone()
+    ime = cur.execute("SELECT ime, priimek FROM oseba WHERE id = %s", (str(identiteta),)).fetchone()
     #jaz sem ta ki uporablja brskalnik
-    jaz = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
+    jaz = cur.execute("SELECT id FROM oseba WHERE uporabnik = %s", (str(user[0]),)).fetchone()
     #oseba katere stran urejam
-    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = %s", (identiteta,)).fetchone()
 
     if identiteta == jaz or int(user[1])==2:
         return rtemplate('oseba-edit.html', oseba=oseba, drustvo=drustvo, naslov="Urejanje "+ime[0]+' '+ime[1])
@@ -267,7 +269,7 @@ def uredi_osebo_post(identiteta):
     starost = request.forms.get('starost')
 
     cur = baza.cursor()
-    cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ? WHERE id = ?", 
+    cur.execute("UPDATE oseba SET ime = %s, priimek = %s, spol = %s, starost = %s WHERE id = %s", 
         (str(ime), str(priimek), str(spol), int(starost), int(identiteta)))
     redirect('/moje_drustvo')
 
@@ -276,7 +278,7 @@ def uredi_osebo_post(identiteta):
 def brisi_osebo(identiteta):
     user = dostop()
     if int(user[1])==2:
-        cur.execute("DELETE FROM oseba WHERE id = ?", (identiteta, ))
+        cur.execute("DELETE FROM oseba WHERE id = %s", (identiteta, ))
     else:
         return napaka403(error)
     redirect('/osebe')
@@ -288,12 +290,12 @@ def lastnosti_osebe(identiteta):
     response.set_cookie('identiteta',identiteta,secret=skrivnost)
 
     cur = baza.cursor()
-    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
-    drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
-    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
+    drustvo = cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = %s", (str(user[0]),)).fetchone()
+    drustvoID = cur.execute("SELECT drustvo FROM oseba WHERE id = %s", (identiteta,)).fetchone()
+    oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = %s", (identiteta,)).fetchone()
 
     #ta ki lahko dodaja hribe v tabelo obiskani za določenega posameznika je admin in oseba sama
-    jaz = (cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone())[0]
+    jaz = (cur.execute("SELECT id FROM oseba WHERE uporabnik = %s", (str(user[0]),)).fetchone())[0]
     #to preverim s spremenljivko dodaj, ki je true kadar lahko dodam
     dodaj = False
     if jaz == identiteta or user[1]==2:
@@ -301,19 +303,19 @@ def lastnosti_osebe(identiteta):
 
     #najvisji osvojen vrh
     najvisji_osvojen_vrh = (cur.execute("""SELECT MAX(visina), ime FROM gore WHERE 
-    id IN (SELECT id_gore FROM obiskane WHERE id_osebe = ?)""", (identiteta,)).fetchone())
+    id IN (SELECT id_gore FROM obiskane WHERE id_osebe = %s)""", (identiteta,)).fetchone())
 
     #stevilo gor, na katerih je bil pohodnik
     stevilo_osvojenih_gor = cur.execute("""
         SELECT COUNT(id_gore) FROM obiskane
-        WHERE id_osebe = ? """, (identiteta, )).fetchone()
+        WHERE id_osebe = %s""", (identiteta, )).fetchone()
 
     #vse gore na katerih je bil/bila
     #izberem zeljene podatke iz gore za nek id v
     # ('where id in', ker 'where id =' dela samo za enega) id_gore iz obiskanih, kjer id isti kot stran 
     vse_osvojene_gore = cur.execute("""SELECT ime, visina, gorovje, drzava FROM gore 
         WHERE id IN (SELECT id_gore FROM obiskane
-        WHERE id_osebe = ?) ORDER BY ime""", (identiteta, )).fetchall()
+        WHERE id_osebe = %s) ORDER BY ime""", (identiteta, )).fetchall()
 
     if drustvo == drustvoID or int(user[1])==2:
         return rtemplate('oseba-id.html', oseba=oseba, stevilo_osvojenih_gor=stevilo_osvojenih_gor[0],
@@ -337,7 +339,7 @@ def osvojena_gora_post():
 
     #osvojene gore
     identiteta = request.get_cookie('identiteta', secret=skrivnost)
-    prej_osvojene = cur.execute("SELECT id_gore FROM obiskane WHERE id_osebe = ?",(identiteta,)).fetchall()
+    prej_osvojene = cur.execute("SELECT id_gore FROM obiskane WHERE id_osebe = %s",(identiteta,)).fetchall()
     osvojene = []
     #cursor nam vrne seznam tuplov [(int,), ...]
     for i in prej_osvojene: 
@@ -353,9 +355,9 @@ def osvojena_gora_post():
     
     #sčistim bazo že osvojenih za naš id in dodam osvojene in leto
     time = datetime.datetime.now()
-    cur.execute("DELETE FROM obiskane WHERE id_osebe = ?", (identiteta, ))
+    cur.execute("DELETE FROM obiskane WHERE id_osebe = %s", (identiteta, ))
     for gora in osvojene:
-        cur.execute("INSERT INTO obiskane (id_gore, id_osebe, leto_pristopa) VALUES (?, ?, ?)",(gora, str(identiteta), int(time.year)))
+        cur.execute("INSERT INTO obiskane (id_gore, id_osebe, leto_pristopa) VALUES (%s, %s, %s)",(gora, str(identiteta), int(time.year)))
     redirect('/osebe/'+str(identiteta))
 
 
@@ -399,7 +401,7 @@ def dodaj_goro_post():
     cur = baza.cursor()
 
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
-        VALUES (?, ?, ?, ?, ?)""",
+        VALUES (%s, %s, %s, %s, %s)""",
          (int(prvi_pristop), str(ime), int(visina), str(gorovje), str(drzava)))
     redirect('/gore')
 
@@ -421,25 +423,25 @@ def drustva_id(ime):
     user = dostop()
     cur = baza.cursor()
     drustvo = cur.execute("""SELECT id, ime, leto_ustanovitve FROM drustva
-        WHERE ime = ?""",(ime,)).fetchone()
+        WHERE ime = %s""",(ime,)).fetchone()
 
     stevilo_clanov_drustvo = cur.execute("""SELECT COUNT (oseba.drustvo) FROM oseba
-	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchone()
+	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = %s)""",(ime,)).fetchone()
 
     clani_drustva = cur.execute("""SELECT id, ime, priimek, spol, starost FROM oseba
-	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = ?)""",(ime,)).fetchall()
+	    WHERE oseba.drustvo = (SELECT ime FROM drustva WHERE ime = %s)""",(ime,)).fetchall()
 
     stevilo_vseh = 0
     najvisja_gora = [0,None]
     for clan in clani_drustva:
         identiteta = clan[0]
         #stevilo osvojenih gora za posameznika
-        osvojenih_gora = cur.execute("SELECT COUNT (id_gore) FROM obiskane WHERE id_osebe = ?",(identiteta,)).fetchone()
+        osvojenih_gora = cur.execute("SELECT COUNT (id_gore) FROM obiskane WHERE id_osebe = %s",(identiteta,)).fetchone()
         stevilo_vseh += osvojenih_gora[0]
 
         #najvisja gora za posameznika
         najvisji_osvojen_vrh = cur.execute("""SELECT MAX(visina), ime FROM gore WHERE 
-        id IN (SELECT id_gore FROM obiskane WHERE id_osebe = ?)""", (identiteta,)).fetchone()
+        id IN (SELECT id_gore FROM obiskane WHERE id_osebe = %s)""", (identiteta,)).fetchone()
 
         if najvisji_osvojen_vrh[1] is not None and najvisji_osvojen_vrh[0] is not None:
             if najvisja_gora[0] <= najvisji_osvojen_vrh[0]:
@@ -473,15 +475,18 @@ def static(filename):
 
 ######################################################################
 
-baza = sqlite3.connect(baza_datoteka, isolation_level=None)
-baza.set_trace_callback(print) # izpis sql stavkov v terminal (za debugiranje pri razvoju)
+#baza sqlite3 v tej mapi (pohodnistvo.db)
+#baza = sqlite3.connect(baza_datoteka, isolation_level=None)
+#baza.set_trace_callback(print) # izpis sql stavkov v terminal (za debugiranje pri razvoju)
+#cur = baza.cursor()
+
+# priklopimo se na bazo na fmf ODKOMENTIRAJ
+baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
+
+
+cur = baza.cursor(cursor_factory=psycopg2.extras.DictCursor)
 # zapoved upoštevanja omejitev FOREIGN KEY
-cur = baza.cursor()
-cur.execute("PRAGMA foreign_keys = ON;")
-
-
-# priklopimo se na bazo ODKOMENTIRAJ
-#conn = psycopg2.connect(sdatabase=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
+#cur.execute("PRAGMA foreign_keys = ON;")
 
 # poženemo strežnik na podanih vratih, npr. http://localhost:8080/
 run(host='localhost', port=SERVER_PORT, reloader=RELOADER)
