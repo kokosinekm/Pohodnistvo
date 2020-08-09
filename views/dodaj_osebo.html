@@ -1,9 +1,8 @@
 %rebase('osnovna.html', naslov='Dodaj pohodnika')
 
-<h2>Dodaj osebo</h2>
-<div class="form-row">
-    <div class="col-4">
-        <form method="post">
+<form method="post"  class="form d-flex justify-content-center">
+    <div class="col-5 justify-content-center">
+        <h2>Dodaj osebo</h2>
             <div class="form-group">
                 <label for="ime">Ime</label>
                 <input id="ime" name="ime" type="text" class="form-control" placeholder="Ime pohodnika..." required
@@ -51,9 +50,8 @@
             <div class="col-4">
                 <button type="submit" class="btn btn-primary">Dodaj</button>
             </div>
-        </form>
+            
+            <br>
+        <a href="{{ROOT}}osebe">Nazaj na osebe</a>
     </div>
-</div>
-
-
-<a href="{{ROOT}}osebe">Nazaj na osebe</a>
+</form>

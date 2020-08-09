@@ -70,13 +70,18 @@ def rtemplate(*largs, **kwargs):
 
 @get('/')
 def osnovna_stran():
+    dostop
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
-    return rtemplate('prijava.html', naslov='Prijava')
+    redirect('/pohodnistvo')
 
 @get('/pohodnistvo')
 def glavna_stran():
     dostop()
     return rtemplate('glavna_stran.html', naslov='Pohodništvo')
+
+@get('/o_projektu')
+def o_projektu():
+    return rtemplate('o_projektu.html')
 
 ######################################################################
 # PRIJAVA / REGISTRACIJA
@@ -238,17 +243,19 @@ def dodaj_osebo_post():
 def uredi_osebo(identiteta):
     user = dostop()
     cur = baza.cursor()
-    drustvo = cur.execute("""
-    SELECT drustva.ime FROM drustva
-        ORDER BY drustva.ime
-    """).fetchall()
+    response.set_cookie('identiteta',identiteta,secret=skrivnost)
+    drustvo = cur.execute("""SELECT drustva.ime FROM drustva ORDER BY drustva.ime""").fetchall()
     #naredimo list iz tupla
     drustvo = list(drustvo)
-
-    identiteta = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
+    #bomo dali v naslov tab-a
+    ime = cur.execute("SELECT ime, priimek FROM oseba WHERE id = ?", (str(identiteta),)).fetchone()
+    #jaz sem ta ki uporablja brskalnik
+    jaz = cur.execute("SELECT id FROM oseba WHERE uporabnik = ?", (str(user[0]),)).fetchone()
+    #oseba katere stran urejam
     oseba = cur.execute("SELECT id, ime, priimek, spol, starost, drustvo FROM oseba WHERE id = ?", (identiteta,)).fetchone()
-    if identiteta == identiteta or int(user[1])==2:
-        return rtemplate('oseba-edit.html', oseba=oseba, drustvo=drustvo, naslov="Pohodnik <identiteta>")
+
+    if identiteta == jaz or int(user[1])==2:
+        return rtemplate('oseba-edit.html', oseba=oseba, drustvo=drustvo, naslov="Urejanje "+ime[0]+' '+ime[1])
     else:
         return napaka403(error)
 
@@ -258,11 +265,11 @@ def uredi_osebo_post(identiteta):
     priimek = request.forms.get('priimek')
     spol = request.forms.get('spol')
     starost = request.forms.get('starost')
-    drustvo = request.forms.get('drustvo')
+
     cur = baza.cursor()
-    cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ?, drustvo = ? WHERE id = ?", 
-        (ime, priimek, spol, starost, drustvo, identiteta))
-    redirect('/osebe')
+    cur.execute("UPDATE oseba SET ime = ?, priimek = ?, spol = ?, starost = ? WHERE id = ?", 
+        (str(ime), str(priimek), str(spol), int(starost), int(identiteta)))
+    redirect('/moje_drustvo')
 
 
 @post('/osebe/brisi/<identiteta>')
@@ -387,9 +394,9 @@ def dodaj_goro_post():
     visina = request.forms.get('visina')
     prvi_pristop = request.forms.get('prvi_pristop')
     drzava = request.forms.get('drzava')
+    gorovje = request.forms.get('gorovje')
 
     cur = baza.cursor()
-    gorovje = request.forms.get('gorovje')
 
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
         VALUES (?, ?, ?, ?, ?)""",
@@ -455,13 +462,6 @@ def static(filename):
     #pomoje tukaj ne rabmo user = dostop(), ker drugace ne nalozi nobenih slik, če nisi prijavljen
     #user = dostop()
     return static_file(filename, root='static')
-
-######################################################################
-# O PROJEKTU
-
-@get('/o_projektu')
-def o_projektu():
-    return rtemplate('o_projektu.html')
 
 ######################################################################
 # Glavni program
