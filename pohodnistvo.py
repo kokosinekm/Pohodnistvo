@@ -124,7 +124,7 @@ def registracija_post():
     if iden is None:
         #id ne obstaja, ni član društva
         javiNapaka(napaka="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi")
-        redirect('/registracija')
+        redirect('/registracija_dodatna')
         return
 
     if len(geslo)<4:
