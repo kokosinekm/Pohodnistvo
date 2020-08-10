@@ -36,7 +36,7 @@ CREATE TABLE gorovje (
 );
 
 CREATE TABLE gore (
-    id                  SERIAL     PRIMARY KEY,
+    id                  SERIAL      PRIMARY KEY,
 	prvi_pristop		INTEGER 	NOT NULL,
 	ime					TEXT		NOT NULL,
 	visina				INTEGER		NOT NULL,
