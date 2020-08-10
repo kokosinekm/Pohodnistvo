@@ -151,6 +151,75 @@ def registracija_post():
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/pohodnistvo')
 
+@get('/registracija_dodatna')
+def registracija_dodatna_get():
+    napaka = javiNapaka()
+    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe')
+
+@post('/registracija_dodatna')
+def registracija_dodatna_post():
+    #poberimo dodatne vnesene podatke
+    identiteta = request.forms.identiteta
+    ime = request.forms.ime
+    priimek = request.forms.priimek
+    starost = request.forms.starost
+    spol = request.forms.spol
+    drustvo = request.forms.drustva
+    uporabnik = request.forms.uporabnik
+    geslo = request.forms.geslo
+    cur = baza.cursor()
+
+
+    if identiteta is None:
+        #id je None
+        javiNapaka(napaka="Neveljavno izbrana identiteta")
+        redirect('/registracija_dodatna')
+        return
+
+    if isinstance(identiteta, int):
+        #id ni število
+        javiNapaka(napaka="Identiteta ni število")
+        redirect('/registracija_dodatna')
+        return
+
+    if len(identiteta)>9999:
+        #id je predolga
+        javiNapaka(napaka="Identiteta predolga.")
+        redirect('/registracija_dodatna')
+        return
+
+    cur.execute("SELECT id FROM oseba")
+    identitete_veljavne = cur.fetchall()
+    if identiteta in identitete_veljavne:
+        #id je že zasedena
+        javiNapaka(napaka="Izbrana identiteta je že zasedena")
+        redirect('/registracija_dodatna')
+        return
+
+    if len(geslo)<4:
+        #dolzina gesla
+        javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
+        redirect('/registracija_dodatna')
+        return
+
+    cur.execute("SELECT uporabnik FROM oseba")
+    identiteta_ze_registriranih= cur.fetchall()
+    if  uporabnik in identiteta_ze_registriranih:
+        #enolicnost uporabnikov
+        javiNapaka(napaka="To uporabniško ime je zasedeno")
+        redirect('/registracija_dodatna')
+        return
+
+    polozaj = 0
+    zgostitev = hashGesla(geslo)
+    #dodamo osebo v tabelo oseba
+    cur.execute("""INSERT INTO oseba (id, ime, priimek, starost, spol, drustvo, uporabnik, geslo, polozaj) 
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                (int(identiteta), str(ime), str(priimek), int(starost), str(spol), str(drustvo), str(uporabnik), str(zgostitev), str(polozaj)))
+    #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    return redirect('/pohodnistvo')
+
 @get('/prijava')
 def prijava():
     napaka = javiNapaka()
