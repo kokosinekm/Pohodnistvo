@@ -153,7 +153,7 @@ def registracija_post():
 
 @get('/registracija_dodatna')
 def registracija_dodatna_get():
-    napaka = javiNapaka()
+    javiNapaka()
     return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe')
 
 @post('/registracija_dodatna')
@@ -567,7 +567,7 @@ def dodaj_goro_post():
 
 @get('/drustva')
 def drustva():
-    user = dostop()
+    dostop()
     cur = baza.cursor()
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
