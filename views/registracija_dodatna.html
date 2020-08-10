@@ -14,7 +14,7 @@
       <label>ID</label> <br>
       <input id="identiteta" name="identiteta" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        oninvalid="this.setCustomValidity('ID ni veljaven')"
       />
       <small class="form-text text-muted">Identiteta je lahko le štiri ali manj mestno število.</small>
     </div>
@@ -23,7 +23,7 @@
       <label>Ime</label> <br>
       <input id="ime" name="ime" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        oninvalid="this.setCustomValidity('Ime ni veljavno')"
       />
       <small class="form-text text-muted">Vnesite le svoje prvo ime.</small>
     </div>
@@ -32,14 +32,14 @@
       <label>Priimek</label> <br>
       <input id="priimek" name="priimek" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        oninvalid="this.setCustomValidity('Priimek ni veljaven')"
       />
     </div>
 
     <div class="form-group">      
       <label>Starost</label> <br>
       <select class="form-control" id="starost" name="starost" required>
-        %for starost in tuple(range(1, 111, 1)):
+        %for starost in tuple(range(1, 150, 1)):
           <option>{{starost}}</option>
         %end
       </select>

@@ -169,20 +169,13 @@ def registracija_dodatna_post():
     geslo = request.forms.geslo
     cur = baza.cursor()
 
-
-    if identiteta is None:
-        #id je None
-        javiNapaka(napaka="Neveljavno izbrana identiteta")
-        redirect('/registracija_dodatna')
-        return
-
     if isinstance(identiteta, int):
         #id ni število
         javiNapaka(napaka="Identiteta ni število")
         redirect('/registracija_dodatna')
         return
 
-    if len(identiteta)>9999:
+    if len(identiteta)>4:
         #id je predolga
         javiNapaka(napaka="Identiteta predolga.")
         redirect('/registracija_dodatna')
