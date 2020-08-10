@@ -206,10 +206,10 @@ def registracija_dodatna_post():
     polozaj = randint(1, 3)
     zgostitev = hashGesla(geslo)
     #dodamo osebo v tabelo oseba
-    cur.execute("INSERT INTO oseba (id, ime, priimek, spol, starost, drustvo, uporabnik, geslo, polozaj) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);", (str(identiteta), str(ime), str(priimek), str(starost), str(spol), str(drustvo), str(uporabnik), str(zgostitev), str(polozaj))).fatchone()
+    cur.execute("INSERT INTO oseba (id, ime, priimek, spol, starost, drustvo, uporabnik, geslo, polozaj) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);", (str(identiteta), str(ime), str(priimek), str(starost), str(spol), str(drustvo), str(uporabnik), str(zgostitev), str(polozaj)))
     #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/pohodnistvo')
+    return redirect('/pohodnistvo')
 
 @get('/prijava')
 def prijava():
