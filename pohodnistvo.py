@@ -1,8 +1,9 @@
-sss#!/usr/bin/python
+#!/usr/bin/python
 # -*- encoding: utf-8 -*-
 
 # uvozimo bottle.py
 from bottle import *
+from random import randint
 import sqlite3
 import hashlib
 import datetime
@@ -114,7 +115,7 @@ def registracija_post():
     if iden is None:
         #id ne obstaja, ni član društva
         javiNapaka(napaka="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi")
-        redirect('/registracija')
+        redirect('/registracija_dodatna')
         return
 
     if len(geslo)<4:
@@ -130,9 +131,82 @@ def registracija_post():
         redirect('/registracija')
         return
 
+@get('/registracija_dodatna')
+def registracija_dodatna_get():
+    napaka = javiNapaka()
+    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe')
+
+@post('/registracija_dodatna')
+def registracija_dodatna_post():
+    #poberimo dodatne vnesene podatke
+    identiteta = request.forms.identiteta
+    ime = request.forms.ime
+    priimek = request.forms.priimek
+    starost = request.forms.starost
+    spol = request.forms.spol
+    drustvo = request.forms.drustvo
+    uporabnik = request.forms.uporabnik
+    geslo = request.forms.geslo
+    cur = baza.cursor()
+
+
+    if identiteta is None:
+        #id je None
+        javiNapaka(napaka="Neveljavno izbrana identiteta")
+        redirect('/registracija_dodatna')
+        return
+
+    if isinstance(identiteta, int):
+        #id ni število
+        javiNapaka(napaka="Identiteta ni število")
+        redirect('/registracija_dodatna')
+        return
+
+    if len(identiteta)>4:
+        #id je predolga
+        javiNapaka(napaka="Identiteta predolga.")
+        redirect('/registracija_dodatna')
+        return
+
+    identitete_veljavne = cur.execute("SELECT id FROM oseba").fetchall()
+    if identiteta in identitete_veljavne:
+        #id je že zasedena
+        javiNapaka(napaka="Izbrana identiteta je že zasedena")
+        redirect('/registracija_dodatna')
+        return
+###########################################################################
+
+    if ime is None:
+        #id je None
+        javiNapaka(napaka="Neveljavno izbrano ime.")
+        redirect('/registracija_dodatna')
+        return
+############################################################################
+
+    if priimek is None:
+        #id je None
+        javiNapaka(napaka="Neveljavno izbran priimek.")
+        redirect('/registracija_dodatna')
+        return
+#############################################################################
+
+    if len(geslo)<4:
+        #dolzina gesla
+        javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
+        redirect('/registracija_dodatna')
+        return
+
+    identiteta_ze_registriranih = cur.execute("SELECT uporabnik FROM oseba").fetchall()
+    if  uporabnik in identiteta_ze_registriranih:
+        #enolicnost uporabnikov
+        javiNapaka(napaka="To uporabniško ime je zasedeno")
+        redirect('/registracija_dodatna')
+        return
+
+    polozaj = randint(1, 3)
     zgostitev = hashGesla(geslo)
-    #brez str() ima lahko težave s tipom podatkov
-    cur.execute("UPDATE oseba SET uporabnik = ?, geslo = ?, polozaj = ? WHERE id = ?", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
+    #dodamo osebo v tabelo oseba
+    cur.execute("INSERT INTO oseba (id, ime, priimek, spol, starost, drustvo, uporabnik, geslo, polozaj) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);", (str(identiteta), str(ime), str(priimek), str(starost), str(spol), str(drustvo), str(uporabnik), str(zgostitev), str(polozaj))).fatchone()
     #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('/pohodnistvo')

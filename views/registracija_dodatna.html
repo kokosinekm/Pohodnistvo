@@ -1,0 +1,98 @@
+%setdefault('napaka','')
+%rebase('osnovna.html', naslov=naslov, napaka=napaka)
+
+<!-- Vsebina strani -->
+<form class="form d-flex justify-content-center" action="/registracija_dodatna" method="post">
+  <div class="col-5 justify-content-center">
+    <h3 style="color:red">{{napaka}}</h3><br>
+  
+    <h1>Dodatna Registracija</h1><br>
+    <h3>Dobrodošel na portalu Pohodništvo.</h3> 
+    <h5>Za registracijo na portal prosim vnesi <b>ID</b>, <b>Ime</b>, <b>Priimek</b>, <b>Starost</b>, <b>Spol</b>, <b>Drustvo</b> in si izmisli <b>Uporabniško ime</b> in <b>Geslo</b>, ki naj bo dolžine vsaj 5.</h5>
+
+    <div class="form-group">      
+      <label>ID</label> <br>
+      <input id="identiteta" name="identiteta" type="text" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+      />
+      <small class="form-text text-muted">Identiteta je lahko le štiri ali manj mestno število.</small>
+    </div>
+
+    <div class="form-group">      
+      <label>Ime</label> <br>
+      <input id="ime" name="ime" type="text" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+      />
+      <small class="form-text text-muted">Vnesite le svoje prvo ime.</small>
+    </div>
+
+    <div class="form-group">      
+      <label>Priimek</label> <br>
+      <input id="priimek" name="priimek" type="text" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+      />
+    </div>
+
+    <div class="form-group">      
+      <label>Starost</label> <br>
+      <select class="form-control" id="starost" name="starost" required>
+        %for starost in tuple(range(1, 111, 1)):
+          <option>{{starost}}</option>
+        %end
+      </select>
+    </div>
+
+    <div class="form-group">      
+      <label>Spol</label> <br>
+      <select class="form-control" id="spol" name="spol" required>
+        %for spol in ['Male', 'Female']:
+          <option>{{spol}}</option>
+        %end
+      </select>
+    </div>
+
+    <div class="form-group">      
+      <label>Spol</label> <br>
+      <select class="form-control" id="drustva" name="drustva" required>
+        %for ime in ['Kohler Morar and Lockman', 'Gutkowski Dickens and Funk', 'Walsh Doyle and Marvin', 'Douglas', 'Predovic and Sons', 'Mueller and Sons', 'Breitenberg-Padberg', 'Hermiston-Kessler', 'Rempel Dare and King', 'Lakin Rolfson and Welch', 'Nader', 'Herman Rath and Erdman', 'Rohan-Trantow', 'Kuphal Kessler and Christiansen', 'Rath-Prohaska']:
+          <option>{{ime}}</option>
+        %end
+      </select>
+    </div>
+
+    <div class="form-group">      
+      <label>Uporabniško ime</label> <br>
+      <input id="uporabnik" name="uporabnik" type="text" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+      />
+      <small class="form-text text-muted">Naj ne bo vulgarno.</small>
+    </div>
+
+    <div class="form-group">
+      <label>Geslo</label> <br>
+      <input id="geslo" name="geslo" type="password" class="form-control" required
+        oninput="this.setCustomValidity('')"
+        oninvalid="this.setCustomValidity('Geslo ni veljavno')"
+      />
+      <br>
+
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" required>
+        <label class="form-check-label">Sem pohodnik!</label>
+      </div>
+
+      <button class="btn btn-primary" type="submit">
+        Registracija
+      </button>
+    </div>
+  </div>
+</form>
+
+<div class="row justify-content-center">
+  <a href="\prijava", font-size:px>Si že registriran? Klikni tu.</a>
+</div>
+
