@@ -3,7 +3,6 @@
 
 # uvozimo bottle.py
 from bottle import *
-from random import randint
 #import sqlite3
 import hashlib
 import datetime
@@ -197,21 +196,18 @@ def registracija_dodatna_post():
         javiNapaka(napaka="Izbrana identiteta je že zasedena")
         redirect('/registracija_dodatna')
         return
-###########################################################################
 
     if ime is None:
         #id je None
         javiNapaka(napaka="Neveljavno izbrano ime.")
         redirect('/registracija_dodatna')
         return
-############################################################################
 
     if priimek is None:
         #id je None
         javiNapaka(napaka="Neveljavno izbran priimek.")
         redirect('/registracija_dodatna')
         return
-#############################################################################
 
     if len(geslo)<4:
         #dolzina gesla
@@ -428,7 +424,6 @@ def dodaj_osebo_post():
 @get('/osebe/uredi/<identiteta>')
 def uredi_osebo(identiteta):
     user = dostop()
-    
     response.set_cookie('identiteta',identiteta,secret=skrivnost)
 
     #jaz je ta, ki uporablja brskalnik
@@ -436,7 +431,7 @@ def uredi_osebo(identiteta):
                 WHERE uporabnik = %s""", (str(user[0]),))
     jaz = cur.fetchone()
 
-    if identiteta != jaz and int(user[1]) != 2:
+    if identiteta != jaz:
         raise HTTPError(403)
 
     #poiscemo drustva
@@ -514,13 +509,12 @@ def lastnosti_osebe(identiteta):
     #najvisji osvojen vrh
     cur.execute("""
                 SELECT visina, ime FROM gore 
-                WHERE id IN 
-                (SELECT id_gore FROM obiskane 
-                WHERE id_osebe = %s) ORDER BY gore.visina""", (identiteta,))
-    najvisji_osvojen_vrh = cur.fetchall()
-    if najvisji_osvojen_vrh != []:
-        najvisji_osvojen_vrh = najvisji_osvojen_vrh[-1]
-    else:
+                JOIN obiskane ON id = id_gore
+                WHERE id=%s
+                ORDER BY gore.visina
+                DESC LIMIT 1""", (identiteta,))
+    najvisji_osvojen_vrh = cur.fetchone()
+    if najvisji_osvojen_vrh is None:
         najvisji_osvojen_vrh = (None, None)
 
     #stevilo gora, na katerih je bil pohodnik
@@ -530,24 +524,13 @@ def lastnosti_osebe(identiteta):
     stevilo_osvojenih_gor = cur.fetchone()
 
     #vse gore na katerih je bil/bila
-    #izberem zeljene podatke iz gore za nek id v
-    # ('where id in', ker 'where id =' dela samo za enega) id_gore iz obiskanih, kjer id isti kot stran 
-    cur.execute("""
-                SELECT id, ime, visina, gorovje, drzava FROM gore 
-                WHERE id IN (SELECT id_gore FROM obiskane
-                WHERE id_osebe = %s) ORDER BY ime""", (identiteta,))
-    vse_osvojene_gore = cur.fetchall()
-    
-    for i in range(len(vse_osvojene_gore)):
-        identiteta_gore = (vse_osvojene_gore[i])[0]
-        cur.execute("""
-                    SELECT leto_pristopa FROM obiskane
-                    WHERE id_gore = %s""", (identiteta_gore,))
-        leto_pristopa_gora = cur.fetchone()
-
-        vse_osvojene_gore[i] = list(vse_osvojene_gore[i])
-        vse_osvojene_gore[i].pop(0)
-        vse_osvojene_gore[i].append(leto_pristopa_gora[0])
+    cur.execute(""" 
+                 SELECT ime, visina, gorovje, drzava, leto_pristopa FROM gore
+                 JOIN obiskane ON id = id_gore
+                 WHERE id_osebe = %s
+                 ORDER BY ime
+                 """, (identiteta, )) 
+    vse_osvojene_gore = cur.fetchall() 
 
     return rtemplate('oseba-id.html',  
                      oseba=oseba, 
