@@ -2,7 +2,7 @@
 %rebase('osnovna.html', naslov=naslov, napaka=napaka)
 
 <!-- Vsebina strani -->
-<form class="form d-flex justify-content-center" action="/registracija_dodatna" method="POST">
+<form class="form d-flex justify-content-center" action="{{ROOT}}registracija_dodatna" method="POST">
   <div class="col-5 justify-content-center">
     %if napaka is not None:
       <h3 style="color:red">{{napaka}}</h3><br>

@@ -1,7 +1,7 @@
 % rebase('osnovna.html', naslov=naslov)
 
 <h2>Uredi osebo</h2>
-<form action="{{'/osebe/uredi/' + str(oseba[0]) if defined('oseba') else '/osebe/dodaj_osebo'}}" method="POST">
+<form action="{{ROOT}}{{'osebe/uredi/' + str(oseba[0]) if defined('oseba') else '/osebe/dodaj_osebo'}}" method="POST">
     <div class="form-row">
         <div class="col-4">
             <div class="form-group">
