@@ -33,11 +33,11 @@ DB_PORT = os.environ.get('POSTGRES_PORT', 5432)
 #ERR in druge dobrote
 @error(404)
 def napaka404(error):
-    return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2><a href="/pohodnistvo", font-size:px>Nazaj na začetno stran.</a>'
+    return '<h1>Stran ne obstaja</h1><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/S%C3%B8ren_Kierkegaard_%281813-1855%29_-_%28cropped%29.jpg" style="width:300px;height:450px;" alt="Kierkegaard"><h2>Tudi Kierkegaard se je spraševal o obstoju, nisi edini</h2><a href="{{ROOT}}pohodnistvo", font-size:px>Nazaj na začetno stran.</a>'
 
 @error(403)
 def napaka403(error):
-    return '<h1>Do te strani nimaš dostopa!</h1><a href="/pohodnistvo", font-size:px>Nazaj na začetno stran.</a>'
+    return '<h1>Do te strani nimaš dostopa!</h1><a href="{{ROOT}}pohodnistvo", font-size:px>Nazaj na začetno stran.</a>'
 
 
 def javiNapaka(napaka = None):
