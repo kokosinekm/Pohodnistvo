@@ -74,19 +74,24 @@ def rtemplate(*largs, **kwargs):
 
 @get('/')
 def osnovna_stran():
-    dostop
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
     redirect('{0}pohodnistvo'.format(ROOT))
 
 @get('/pohodnistvo')
 def glavna_stran():
-    dostop()
+    user= dostop()
     return rtemplate('glavna_stran.html', 
-                    naslov='Pohodništvo')
+                    naslov='Pohodništvo',
+                    user=user)
 
 @get('/o_projektu')
 def o_projektu():
-    return rtemplate('o_projektu.html')
+    uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
+    cur.execute("""SELECT polozaj FROM oseba 
+                    WHERE uporabnik = %s""", (uporabnik,))
+    polozaj = cur.fetchone()
+    user = [uporabnik,polozaj[0]]
+    return rtemplate('o_projektu.html', naslov='O projektu', user=user)
 
 ######################################################################
 # PRIJAVA / REGISTRACIJA
@@ -272,6 +277,7 @@ def moje_drustvo():
 
     polozaj = int(user[1])
     return rtemplate('moje_drustvo.html', 
+                    naslov='Moje društvo'
                     osebe=osebe, 
                     polozaj = polozaj)
 
@@ -316,7 +322,8 @@ def dodaj_osebo():
     drustvo = [x[0] for x in drustvo]
 
     return rtemplate('dodaj_osebo.html', 
-                     drustvo=drustvo)
+                     drustvo=drustvo,
+                     naslov='Dodaj osebo'))
 
 @post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
@@ -521,7 +528,6 @@ def osvojena_gora_post():
 
 @get('/gore')
 def gore():
-    
     cur.execute("""
                 SELECT prvi_pristop, ime, visina, gorovje, drzava 
                 FROM gore ORDER BY ime
@@ -536,7 +542,7 @@ def gore():
         polozaj = (cur.fetchone())[0]
     else:
         polozaj = 0
-    return rtemplate('gore.html', gore=gore, pravice=polozaj)
+    return rtemplate('gore.html', gore=gore, pravice=polozaj, naslov='Gore')
 
 @get('/gore/dodaj goro')
 def dodaj_goro():
@@ -595,10 +601,8 @@ def drustva():
 
 @get('/drustva/<ime>')
 def drustva_id(ime):
-    user = dostop()
+    dostop()
     
-    if int(user[1]) != 2:
-        raise HTTPError(403)
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
                 WHERE ime = %s""",(ime,))

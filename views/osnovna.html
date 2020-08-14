@@ -39,9 +39,15 @@
 
       <span class="navbar-text">
         <ul class="navbar-nav">
-          <li>
-            <a class="nav-link" href="{{ROOT}}odjava"><b>Odjava</b></a>
-          </li>
+          %if user == False:
+            <li>
+              <a class="nav-link" href="{{ROOT}}prijava"><b>Prijava</b></a>
+            </li>
+          %else:
+            <li>
+              <a class="nav-link" href="{{ROOT}}odjava"><b>Odjava</b></a>
+            </li>
+          %end
         </ul>
       </span>
 
@@ -52,7 +58,7 @@
       <div class="row">
         <!-- Leva stran -->
         <div class="col-2 my-4">
-          <img src="{{ROOT}}static/oglas_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">
+          <img src="{{ROOT}}static/oglas_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="400">
         </div>
 
         <!-- Sredina -->
@@ -63,7 +69,7 @@
 
         <!-- Desna stran-->
         <div class="col-2 my-4">
-          <img src="{{ROOT}}static/oglas2_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">
+          <img src="{{ROOT}}static/oglas2_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="300">
         </div>
       </div>
     </div>
