@@ -90,7 +90,10 @@ def o_projektu():
     cur.execute("""SELECT polozaj FROM oseba 
                     WHERE uporabnik = %s""", (uporabnik,))
     polozaj = cur.fetchone()
-    user = [uporabnik,polozaj[0]]
+    if polozaj:
+        user = [uporabnik,polozaj[0]]
+    else:
+        user = [uporabnik,None]
     return rtemplate('o_projektu.html', naslov='O projektu', user=user)
 
 ######################################################################
@@ -277,7 +280,7 @@ def moje_drustvo():
 
     polozaj = int(user[1])
     return rtemplate('moje_drustvo.html', 
-                    naslov='Moje društvo'
+                    naslov='Moje društvo',
                     osebe=osebe, 
                     polozaj = polozaj)
 
@@ -323,7 +326,7 @@ def dodaj_osebo():
 
     return rtemplate('dodaj_osebo.html', 
                      drustvo=drustvo,
-                     naslov='Dodaj osebo'))
+                     naslov='Dodaj osebo')
 
 @post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
