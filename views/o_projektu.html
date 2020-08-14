@@ -1,3 +1,4 @@
+%setdefault('user', True)
 %rebase('osnovna.html', naslov='O projektu')
 
 <h2>Par besed o projektu</h2>
@@ -29,7 +30,9 @@
       </div>
       <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
         <div class="card-body">
-          <img src="/static/test.jpg" class="img-thumbnail" alt="Diagram"> 
+          <div class="text-center">
+          <img src="{{ROOT}}static/test.jpg" class="img-thumbnail" alt="Diagram">
+          </div>
         </div>
       </div>
     </div>

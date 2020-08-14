@@ -1,12 +1,13 @@
+%setdefault('user', True)
 % rebase('osnovna.html', naslov=naslov)
 
 <div class="container my-4"></div>
 <div class="row">
     <div class="col-4">
         %if oseba[3] == 'Male':
-        <img src="/static/man.png" alt='...' class="img-thumbnail">
+        <img src="{{ROOT}}static/man.png" alt='...' class="img-thumbnail">
         %else:
-        <img src="/static/woman.png" alt='...' class="img-thumbnail">
+        <img src="{{ROOT}}static/woman.png" alt='...' class="img-thumbnail">
         %end
     </div>
     <div class="col-8">
@@ -30,7 +31,7 @@
 
         <h4>Število osvojenih gora: {{stevilo_osvojenih_gor}}</h4>
         %if dodaj:
-            <form class="col-8" action="/osebe/dodaj goro" method="get">
+            <form class="col-8" action="{{ROOT}}osebe/dodaj goro" method="GET">
                 <a href="#" onclick="this.parentElement.submit()" style="font-size:20px">Dodaj osvojene gore</a>
             </form>
         %end
@@ -48,16 +49,18 @@
                 <th scope="col">Višina</th>
                 <th scope="col">Gorovje</th>
                 <th scope="col">Država</th>
+                <th scope="col">Prvi pristop</th>
             </tr>
         </thead>
         
         <tbody>
-            %for (ime, visina, gorovje, drzava) in vse_osvojene_gore:
+            %for (ime, visina, gorovje, drzava, leto_pristopa) in vse_osvojene_gore:
             <tr>
                 <td>{{ime}}</td>
                 <td>{{visina}}</td>
                 <td>{{gorovje}}</td>
                 <td>{{drzava}}</td>
+                <td>{{leto_pristopa}}</td>
               </tr>
             %end
         </tbody>

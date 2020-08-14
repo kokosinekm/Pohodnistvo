@@ -1,10 +1,13 @@
 %setdefault('napaka','')
+%setdefault('user', True)
 %rebase('osnovna.html', naslov=naslov, napaka=napaka)
 
 <!-- Vsebina strani -->
-<form class="form d-flex justify-content-center" action="/registracija" method="post">
+<form class="form d-flex justify-content-center" action="{{ROOT}}registracija" method="POST">
   <div class="col-5 justify-content-center">
-    <h3 style="color:red">{{napaka}}</h3><br>
+    %if napaka is not None:
+      <h3 style="color:red">{{napaka}}</h3><br>
+    %end
   
     <h1>Registracija</h1><br>
     <h3>Dobrodošel na portalu Pohodništvo.</h3> 
@@ -48,6 +51,6 @@
 </form>
 
 <div class="row justify-content-center">
-  <a href="\prijava", font-size:px>Si že registriran? Klikni tu.</a>
+  <a href="{{ROOT}}prijava", font-size:px>Si že registriran? Klikni tu.</a>
 </div>
 

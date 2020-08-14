@@ -4,7 +4,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="shortcut icon" type="image/x-icon" href="/static/ikona_gora.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{ROOT}}static/ikona_gora.ico" />
   </head>
 
   <!-- Barva ozadja-->
@@ -12,7 +12,7 @@
 
     <!--Navbar-->
     <header class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
-      <img src="/static/ikona_gora_inverz.ico" width="30" height="30" class="d-inline-block align-top" alt="">
+      <img src="{{ROOT}}static/ikona_gora_inverz.ico" width="30" height="30" class="d-inline-block align-top" alt="">
       <a class="navbar-brand" href="{{ROOT}}pohodnistvo">Pohodništvo</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -39,9 +39,15 @@
 
       <span class="navbar-text">
         <ul class="navbar-nav">
-          <li>
-            <a class="nav-link" href="{{ROOT}}odjava"><b>Odjava</b></a>
-          </li>
+          %if user == None:
+            <li>
+              <a class="nav-link" href="{{ROOT}}prijava"><b>Prijava</b></a>
+            </li>
+          %else:
+            <li>
+              <a class="nav-link" href="{{ROOT}}odjava"><b>Odjava</b></a>
+            </li>
+          %end
         </ul>
       </span>
 
@@ -52,7 +58,9 @@
       <div class="row">
         <!-- Leva stran -->
         <div class="col-2 my-4">
-          <img src="/static/oglas_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">
+          <img src="{{ROOT}}static/oglas_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="400">
+          <br>
+          <img src="{{ROOT}}static/oglas3.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="400">
         </div>
 
         <!-- Sredina -->
@@ -63,7 +71,9 @@
 
         <!-- Desna stran-->
         <div class="col-2 my-4">
-          <img src="/static/oglas2_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="250" height="450">
+          <img src="{{ROOT}}static/oglas2_gif.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="400">
+          <br>
+          <img src="{{ROOT}}static/oglas4.gif" class="d-block w-100" alt="Ojoj, nor oglas!" width="400">
         </div>
       </div>
     </div>
@@ -82,7 +92,7 @@
 
 
   <!-- Povezava do JavaScript za iskanje po tabelah -->
-  <script src="/static/pohodnistvo.js"></script> 
+  <script src="{{ROOT}}static/pohodnistvo.js"></script> 
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->

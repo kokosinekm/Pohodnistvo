@@ -1,10 +1,13 @@
 %setdefault('napaka','')
+%setdefault('user', True)
 %rebase('osnovna.html', naslov=naslov, napaka=napaka)
 
 <!-- Vsebina strani -->
-<form class="form d-flex justify-content-center" action="/registracija_dodatna" method="post">
+<form class="form d-flex justify-content-center" action="{{ROOT}}registracija_dodatna" method="POST">
   <div class="col-5 justify-content-center">
-    <h3 style="color:red">{{napaka}}</h3><br>
+    %if napaka is not None:
+      <h3 style="color:red">{{napaka}}</h3><br>
+    %end
   
     <h1>Dodatna Registracija</h1><br>
     <h3>Dobrodošel na portalu Pohodništvo.</h3> 
@@ -14,7 +17,8 @@
       <label>ID</label> <br>
       <input id="identiteta" name="identiteta" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        oninvalid="this.setCustomValidity('ID ni veljaven')"
+
       />
       <small class="form-text text-muted">Identiteta je lahko le štiri ali manj mestno število.</small>
     </div>
@@ -23,7 +27,7 @@
       <label>Ime</label> <br>
       <input id="ime" name="ime" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        oninvalid="this.setCustomValidity('Ime ni veljavno')"
       />
       <small class="form-text text-muted">Vnesite le svoje prvo ime.</small>
     </div>
@@ -32,14 +36,14 @@
       <label>Priimek</label> <br>
       <input id="priimek" name="priimek" type="text" class="form-control" required
         oninput="this.setCustomValidity('')"
-        oninvalid="this.setCustomValidity('Uporabniško ime ni veljavno')"
+        oninvalid="this.setCustomValidity('Priimek ni veljaven')"
       />
     </div>
 
     <div class="form-group">      
       <label>Starost</label> <br>
       <select class="form-control" id="starost" name="starost" required>
-        %for starost in tuple(range(1, 111, 1)):
+        %for starost in tuple(range(1, 150, 1)):
           <option>{{starost}}</option>
         %end
       </select>
@@ -55,7 +59,7 @@
     </div>
 
     <div class="form-group">      
-      <label>Spol</label> <br>
+      <label>Drustvo</label> <br>
       <select class="form-control" id="drustva" name="drustva" required>
         %for ime in ['Kohler Morar and Lockman', 'Gutkowski Dickens and Funk', 'Walsh Doyle and Marvin', 'Douglas', 'Predovic and Sons', 'Mueller and Sons', 'Breitenberg-Padberg', 'Hermiston-Kessler', 'Rempel Dare and King', 'Lakin Rolfson and Welch', 'Nader', 'Herman Rath and Erdman', 'Rohan-Trantow', 'Kuphal Kessler and Christiansen', 'Rath-Prohaska']:
           <option>{{ime}}</option>
@@ -93,6 +97,5 @@
 </form>
 
 <div class="row justify-content-center">
-  <a href="\prijava", font-size:px>Si že registriran? Klikni tu.</a>
+  <a href="{{ROOT}}prijava", font-size:px>Si že registriran? Klikni tu.</a>
 </div>
-

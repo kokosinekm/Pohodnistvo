@@ -1,3 +1,4 @@
+%setdefault('user', True)
 %rebase('osnovna.html', naslov=naslov)
 
 
@@ -22,7 +23,7 @@
         %for (id, ime, leto_ustanovitve) in drustva:
         <tr>
             <td>
-                <form action="/drustva/{{ime}}" method="get">
+                <form action="{{ROOT}}drustva/{{ime}}" method="GET">
                     <a href="#" onclick="this.parentElement.submit()">{{ime}}</a>
                 </form>
             </td>

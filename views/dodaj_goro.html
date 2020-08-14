@@ -1,18 +1,19 @@
+%setdefault('user', True)
 %rebase('osnovna.html', naslov=naslov)
 
-<form method="post"  class="form d-flex justify-content-center">
+<form method="POST"  class="form d-flex justify-content-center">
     <div class="col-5 justify-content-center">
         <h2>Dodaj goro</h2>
         <div class="form-group">
             <label>Ime (Pisano z veliko začetnico)</label>
-            <input id="ime_gore" name="ime_gore" type="text" class="form-control" placeholder="Ime hribčka..." required
+            <input id="ime_gore" name="ime_gore" type="text" class="form-control" placeholder="Ime gore..." required
                 oninput="this.setCustomValidity('')"
                 oninvalid="this.setCustomValidity('Obvezno polje')">
             </div>
 
             <div class="form-group">
                 <label>Višina (V metrih)</label>
-                <input id="visina" name="visina" type="text" class="form-control" placeholder="Višina hribčka..." required
+                <input id="visina" name="visina" type="text" class="form-control" placeholder="Višina gore..." required
                 oninput="this.setCustomValidity('')"
                 oninvalid="this.setCustomValidity('Obvezno polje')">
             </div>

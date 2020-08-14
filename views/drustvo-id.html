@@ -1,10 +1,11 @@
+%setdefault('user', True)
 % rebase('osnovna.html', naslov=naslov)
 
 <div class="container my-4"></div>
 
 <div class="row">
     <div class="col-4">
-        <img src="/static/drustvo_logo.jpg" alt='Lep logotip' class="img-thumbnail">
+        <img src="{{ROOT}}static/drustvo_logo.jpg" alt='Lep logotip' class="img-thumbnail">
     </div>
     <div class="col-8">
         <h2>{{drustvo[1]}}</h2>
