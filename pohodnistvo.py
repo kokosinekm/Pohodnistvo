@@ -61,7 +61,7 @@ def dostop():
                     WHERE uporabnik = %s""", (uporabnik,))
         polozaj = cur.fetchone()
         return [uporabnik,polozaj[0]]
-    redirect('{0}prijava')
+    redirect('{0}prijava'.format(ROOT))
 
 ######################################################################
 # OSNOVNE STRANI
