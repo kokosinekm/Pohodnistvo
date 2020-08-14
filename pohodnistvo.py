@@ -76,7 +76,7 @@ def rtemplate(*largs, **kwargs):
 def osnovna_stran():
     dostop
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
-    redirect('{0}pohodnistvo')
+    redirect('{0}pohodnistvo'.format(ROOT))
 
 @get('/pohodnistvo')
 def glavna_stran():
