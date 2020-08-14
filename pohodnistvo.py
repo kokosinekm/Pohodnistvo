@@ -583,7 +583,7 @@ def drustva():
 
 @get('/drustva/<ime>')
 def drustva_id(ime):
-    user = dostop()
+    dostop()
     cur = baza.cursor()
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
@@ -630,16 +630,14 @@ def drustva_id(ime):
     #naredimo list iz tuple
     clani_drustva = [(x[1], x[2], x[3], x[4]) for x in clani_drustva]       
 
-    if int(user[1]) == 2:
-        return rtemplate('drustvo-id.html', 
+    # Zdaj imajo vsi vpogled v vsa drustva:
+    return rtemplate('drustvo-id.html', 
                         drustvo=drustvo,
                         stevilo_clanov_drustvo=stevilo_clanov_drustvo[0],
                         clani_drustva=clani_drustva,
                         naslov='Društvo {0}'.format(ime), 
                         vse = stevilo_vseh, 
                         najvisja = najvisja_gora)
-    else:
-        return napaka403(error)
         
 ######################################################################
 # Za STATIC datoteke(slike)
