@@ -229,7 +229,8 @@ def prijava_post():
     
     hashGeslo = None
     try: 
-        cur.execute("SELECT geslo FROM oseba WHERE uporabnik = %s", (uporabnik,))
+        ukaz = ("SELECT geslo FROM oseba WHERE uporabnik = (%s)")
+        cur.execute(ukaz, (uporabnik,))
         hashGeslo = cur.fetchone()
         hashGeslo = hashGeslo[0]
     except:
@@ -242,8 +243,8 @@ def prijava_post():
         javiNapaka('Geslo ni pravilno')
         redirect('{0}prijava'.format(ROOT))
         return
-    #response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('{0}gore'.format(ROOT))
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    redirect('{0}pohodnistvo'.format(ROOT))
 
 @get('/odjava')
 def odjava():
