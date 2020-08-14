@@ -53,7 +53,7 @@ skrivnost = "NekaVelikaDolgaSmesnaStvar"
 
 def dostop():
     uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
-    cur = baza.cursor()
+    
     #povezava na bazo ne deluje, oziroma bere bazo kot prazno? HELP pls
     if uporabnik:
         cur.execute("""
@@ -110,7 +110,7 @@ def registracija_post():
     identiteta = request.forms.identiteta
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-    cur = baza.cursor()
+    
     iden = None
 
     try: 
@@ -167,7 +167,7 @@ def registracija_dodatna_post():
     drustvo = request.forms.drustva
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-    cur = baza.cursor()
+    
 
     if isinstance(identiteta, int):
         #id ni število
@@ -226,7 +226,7 @@ def prijava_post():
     #poberimo vnesene podatke
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-    cur = baza.cursor()
+    
     hashGeslo = None
     try: 
         cur.execute("SELECT geslo FROM oseba WHERE uporabnik = %s", (uporabnik,))
@@ -258,7 +258,7 @@ def odjava():
 def moje_drustvo():
     user = dostop()
     uporabnik = str(user[0])
-    cur = baza.cursor()
+    
 
     cur.execute("""SELECT drustvo FROM oseba 
                 WHERE uporabnik = %s""", (uporabnik,))
@@ -292,7 +292,7 @@ def osebe():
     if int(user[1])!=2:
         raise HTTPError(403)
 
-    cur = baza.cursor()
+    
     cur.execute("""
                 SELECT id, ime, priimek, spol, starost, drustvo FROM oseba
                 ORDER BY oseba.priimek""")
@@ -328,7 +328,7 @@ def dodaj_osebo_post():
         spol = 'Female'
     starost = request.forms.get('starost')
     drustvo = request.forms.get('drustvo')
-    cur = baza.cursor()
+    
     cur.execute("""INSERT INTO oseba (ime, priimek, spol, starost, drustvo) 
                 VALUES (%s, %s, %s, %s, %s)""", (ime, priimek, spol, starost, drustvo))
     redirect('{0}osebe'.format(ROOT))
@@ -336,7 +336,7 @@ def dodaj_osebo_post():
 @get('/osebe/uredi/<identiteta>')
 def uredi_osebo(identiteta):
     user = dostop()
-    cur = baza.cursor()
+    
     response.set_cookie('identiteta',identiteta,secret=skrivnost)
 
     #jaz je ta, ki uporablja brskalnik
@@ -375,7 +375,7 @@ def uredi_osebo_post(identiteta):
     spol = request.forms.get('spol')
     starost = request.forms.get('starost')
 
-    cur = baza.cursor()
+    
     cur.execute("UPDATE oseba SET ime = %s, priimek = %s, spol = %s, starost = %s WHERE id = %s", 
                 (str(ime), str(priimek), str(spol), int(starost), int(identiteta)))
     redirect('{0}moje_drustvo'.format(ROOT))
@@ -396,7 +396,7 @@ def lastnosti_osebe(identiteta):
     #dolocim identiteto osebe, kjer bom brskal (admin ni nujno enak identiteti kjer ureja)
     response.set_cookie('identiteta',identiteta,secret=skrivnost)
 
-    cur = baza.cursor()
+    
 
     cur.execute("SELECT drustvo FROM oseba WHERE uporabnik = %s", (str(user[0]),))
     drustvo = cur.fetchone()
@@ -468,7 +468,7 @@ def lastnosti_osebe(identiteta):
 @get('/osebe/dodaj goro')
 def osvojena_gora():
     dostop()
-    cur = baza.cursor()
+    
     cur.execute("""SELECT id, prvi_pristop, ime, visina, gorovje, drzava 
                 FROM gore ORDER BY ime""")
     gore = cur.fetchall()
@@ -478,7 +478,7 @@ def osvojena_gora():
 
 @post('/osebe/dodaj goro')
 def osvojena_gora_post():
-    cur = baza.cursor()
+    
     #seznam gora
     gore = cur.execute("SELECT id FROM gore")
     gore = list(cur.fetchall())
@@ -520,7 +520,7 @@ def osvojena_gora_post():
 
 @get('/gore')
 def gore():
-    cur = baza.cursor()
+    
     cur.execute("""
                 SELECT prvi_pristop, ime, visina, gorovje, drzava 
                 FROM gore ORDER BY ime
@@ -540,7 +540,7 @@ def gore():
 @get('/gore/dodaj goro')
 def dodaj_goro():
     dostop()
-    cur = baza.cursor()
+    
     cur.execute("""
                 SELECT gorovje.ime FROM gorovje
                 ORDER BY gorovje.ime
@@ -569,7 +569,7 @@ def dodaj_goro_post():
     drzava = request.forms.get('drzava')
     gorovje = request.forms.get('gorovje')
 
-    cur = baza.cursor()
+    
 
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
         VALUES (%s, %s, %s, %s, %s)""",
@@ -582,7 +582,7 @@ def dodaj_goro_post():
 @get('/drustva')
 def drustva():
     dostop()
-    cur = baza.cursor()
+    
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
                 ORDER BY drustva.ime
@@ -595,7 +595,7 @@ def drustva():
 @get('/drustva/<ime>')
 def drustva_id(ime):
     user = dostop()
-    cur = baza.cursor()
+    
     if int(user[1]) != 2:
         raise HTTPError(403)
     cur.execute("""
@@ -668,7 +668,7 @@ def static(filename):
 #baza sqlite3 v tej mapi (pohodnistvo.db)
     #baza = sqlite3.connect(baza_datoteka, isolation_level=None)
     #baza.set_trace_callback(print) # izpis sql stavkov v terminal (za debugiranje pri razvoju)
-    #cur = baza.cursor()
+    #
 
 # priklopimo se na bazo na fmf
 baza = psycopg2.connect(database=auth.db, host=auth.host, user=auth.user, password=auth.password, port=DB_PORT)
