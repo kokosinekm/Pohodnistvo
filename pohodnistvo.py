@@ -61,7 +61,7 @@ def dostop():
                     WHERE uporabnik = %s""", (uporabnik,))
         polozaj = cur.fetchone()
         return [uporabnik,polozaj[0]]
-    redirect('/prijava')
+    redirect('{0}prijava')
 
 ######################################################################
 # OSNOVNE STRANI
@@ -76,7 +76,7 @@ def rtemplate(*largs, **kwargs):
 def osnovna_stran():
     dostop
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
-    redirect('/pohodnistvo')
+    redirect('{0}pohodnistvo')
 
 @get('/pohodnistvo')
 def glavna_stran():
@@ -124,13 +124,13 @@ def registracija_post():
     if iden is None:
         #id ne obstaja, ni član društva
         javiNapaka(napaka="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi")
-        redirect('/registracija_dodatna'.format(ROOT))
+        redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     if len(geslo)<4:
         #dolzina gesla
         javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
-        redirect('/registracija'.format(ROOT))
+        redirect('{0}registracija'.format(ROOT))
         return
 
     cur.execute("""
@@ -141,7 +141,7 @@ def registracija_post():
     if identiteta2 != None and identiteta != identiteta2:
         #enolicnost uporabnikov
         javiNapaka(napaka="To uporabniško ime je zasedeno")
-        redirect('/registracija'.format(ROOT))
+        redirect('{0}registracija'.format(ROOT))
         return
 
     zgostitev = hashGesla(geslo)
@@ -149,7 +149,7 @@ def registracija_post():
     cur.execute("UPDATE oseba SET uporabnik = %s, geslo = %s, polozaj = %s WHERE id = %s", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
     #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/pohodnistvo'.format(ROOT))
+    redirect('{0}pohodnistvo'.format(ROOT))
 
 @get('/registracija_dodatna')
 def registracija_dodatna_get():
@@ -172,13 +172,13 @@ def registracija_dodatna_post():
     if isinstance(identiteta, int):
         #id ni število
         javiNapaka(napaka="Identiteta ni število")
-        redirect('/registracija_dodatna'.format(ROOT))
+        redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     if len(identiteta)>4:
         #id je predolga
         javiNapaka(napaka="Identiteta predolga.")
-        redirect('/registracija_dodatna'.format(ROOT))
+        redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     cur.execute("SELECT id FROM oseba")
@@ -186,13 +186,13 @@ def registracija_dodatna_post():
     if identiteta in identitete_veljavne:
         #id je že zasedena
         javiNapaka(napaka="Izbrana identiteta je že zasedena")
-        redirect('/registracija_dodatna'.format(ROOT))
+        redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     if len(geslo)<4:
         #dolzina gesla
         javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
-        redirect('/registracija_dodatna'.format(ROOT))
+        redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     cur.execute("SELECT uporabnik FROM oseba")
@@ -200,7 +200,7 @@ def registracija_dodatna_post():
     if  uporabnik in identiteta_ze_registriranih:
         #enolicnost uporabnikov
         javiNapaka(napaka="To uporabniško ime je zasedeno")
-        redirect('/registracija_dodatna'.format(ROOT))
+        redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     polozaj = 0
@@ -211,7 +211,7 @@ def registracija_dodatna_post():
                 (int(identiteta), str(ime), str(priimek), int(starost), str(spol), str(drustvo), str(uporabnik), str(zgostitev), str(polozaj)))
     #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/pohodnistvo'.format(ROOT))
+    redirect('{0}pohodnistvo'.format(ROOT))
     return 
 
 @get('/prijava')
@@ -236,20 +236,20 @@ def prijava_post():
         hashGeslo = None
     if hashGeslo is None:
         javiNapaka('Niste še registrirani')
-        redirect('/prijava'.format(ROOT))
+        redirect('{0}prijava'.format(ROOT))
         return
     if hashGesla(geslo) != hashGeslo:
         javiNapaka('Geslo ni pravilno')
-        redirect('/prijava')
+        redirect('{0}prijava')
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('/pohodnistvo'.format(ROOT))
+    redirect('{0}pohodnistvo'.format(ROOT))
 
 @get('/odjava')
 def odjava():
     response.delete_cookie('uporabnik')
     response.delete_cookie('identiteta')
-    redirect('/prijava'.format(ROOT))
+    redirect('{0}prijava'.format(ROOT))
     
 ######################################################################
 # MOJE DRUŠTVO
@@ -279,7 +279,7 @@ def moje_drustvo():
 def dodaj_osebo_drustvo():
     user = dostop()
     if int(user[1]) > 0:
-        redirect('/osebe/dodaj_osebo'.format(ROOT))
+        redirect('{0}osebe/dodaj_osebo'.format(ROOT))
     else:
         raise HTTPError(403)
 
@@ -331,7 +331,7 @@ def dodaj_osebo_post():
     cur = baza.cursor()
     cur.execute("""INSERT INTO oseba (ime, priimek, spol, starost, drustvo) 
                 VALUES (%s, %s, %s, %s, %s)""", (ime, priimek, spol, starost, drustvo))
-    redirect('/osebe'.format(ROOT))
+    redirect('{0}osebe'.format(ROOT))
 
 @get('/osebe/uredi/<identiteta>')
 def uredi_osebo(identiteta):
@@ -378,7 +378,7 @@ def uredi_osebo_post(identiteta):
     cur = baza.cursor()
     cur.execute("UPDATE oseba SET ime = %s, priimek = %s, spol = %s, starost = %s WHERE id = %s", 
                 (str(ime), str(priimek), str(spol), int(starost), int(identiteta)))
-    redirect('/moje_drustvo'.format(ROOT))
+    redirect('{0}moje_drustvo'.format(ROOT))
 
 
 @post('/osebe/brisi/<identiteta>')
@@ -388,7 +388,7 @@ def brisi_osebo(identiteta):
         raise HTTPError(403)
 
     cur.execute("DELETE FROM oseba WHERE id = %s", (identiteta,))
-    redirect('/osebe'.format(ROOT))
+    redirect('{0}osebe'.format(ROOT))
 
 @get('/osebe/<identiteta>')
 def lastnosti_osebe(identiteta):
@@ -510,7 +510,7 @@ def osvojena_gora_post():
     cur.execute("DELETE FROM obiskane WHERE id_osebe = %s", (identiteta,))
     for gora in osvojene:
         cur.execute("INSERT INTO obiskane (id_gore, id_osebe, leto_pristopa) VALUES (%s, %s, %s)",(int(gora[0]), str(identiteta), gora[1]))
-    redirect('/osebe/'+str(identiteta).format(ROOT))
+    redirect('{0}osebe/'+str(identiteta).format(ROOT))
 
 
 ######################################################################
@@ -572,7 +572,8 @@ def dodaj_goro_post():
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
         VALUES (%s, %s, %s, %s, %s)""",
          (int(prvi_pristop), str(ime), int(visina), str(gorovje), str(drzava)))
-    redirect('/gore'.format(ROOT))
+    pot = '{0}gore'.format(ROOT)
+    redirect(pot)
 
 ######################################################################
 # DRUSTVA
