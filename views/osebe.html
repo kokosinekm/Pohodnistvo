@@ -28,7 +28,7 @@
         <tr>
             <!-- Ime in priimek sta skupaj, zato da iskanje dela ne glede na to ali iščeš po imenu ali po priimku.-->
             <td>
-                <form action="{{ROOT}}osebe/{{id}}" method="get">
+                <form action="{{ROOT}}osebe/{{id}}" method="GET">
                     <a href="#" onclick="this.parentElement.submit()">{{ime + ' ' + priimek}}</a>
                 </form>
             </td>
@@ -36,10 +36,10 @@
             <td>{{starost}}</td>
             <td>{{drustvo}}</td>
             <td>
-                <form action="{{ROOT}}osebe/uredi/{{id}}" method="get">
+                <form action="{{ROOT}}osebe/uredi/{{id}}" method="GET">
                     <a href="#" onclick="this.parentElement.submit()">Uredi</a>
                 </form>
-                <form action="{{ROOT}}osebe/brisi/{{id}}" method="post">
+                <form action="{{ROOT}}osebe/brisi/{{id}}" method="POST">
                     <a href="#" onclick="this.parentElement.submit()">Briši</a>
                 </form>
             </td>
