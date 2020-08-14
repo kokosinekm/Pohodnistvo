@@ -230,8 +230,8 @@ def prijava_post():
     hashGeslo = None
     try: 
         cur.execute("SELECT geslo FROM oseba WHERE uporabnik = %s", (uporabnik,))
-        hashGeslo = cur.fetchone()
-        hashGeslo = hashGeslo[0]
+        hashGeslo = cur[0]
+        #hashGeslo = hashGeslo[0]
     except:
         hashGeslo = None
     if hashGeslo is None:
