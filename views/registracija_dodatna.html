@@ -4,7 +4,9 @@
 <!-- Vsebina strani -->
 <form class="form d-flex justify-content-center" action="/registracija_dodatna" method="post">
   <div class="col-5 justify-content-center">
-    <h3 style="color:red">{{napaka}}</h3><br>
+    %if napaka is not None:
+      <h3 style="color:red">{{napaka}}</h3><br>
+    %end
   
     <h1>Dodatna Registracija</h1><br>
     <h3>Dobrodošel na portalu Pohodništvo.</h3> 

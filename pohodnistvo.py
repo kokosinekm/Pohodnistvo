@@ -61,7 +61,7 @@ def dostop():
                     WHERE uporabnik = %s""", (uporabnik,))
         polozaj = cur.fetchone()
         return [uporabnik,polozaj[0]]
-    redirect('{0}prijava/'.format(ROOT))
+    redirect('{0}prijava'.format(ROOT))
 
 ######################################################################
 # OSNOVNE STRANI
@@ -236,7 +236,7 @@ def prijava_post():
         hashGeslo = None
     if hashGeslo is None:
         javiNapaka('Niste še registrirani')
-        redirect('{0}prijava/'.format(ROOT))
+        redirect('{0}prijava'.format(ROOT))
         return
     if hashGesla(geslo) != hashGeslo:
         javiNapaka('Geslo ni pravilno')
@@ -249,7 +249,7 @@ def prijava_post():
 def odjava():
     response.delete_cookie('uporabnik')
     response.delete_cookie('identiteta')
-    redirect('{0}prijava/'.format(ROOT))
+    redirect('{0}prijava'.format(ROOT))
     
 ######################################################################
 # MOJE DRUŠTVO
