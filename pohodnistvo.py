@@ -74,19 +74,19 @@ def rtemplate(*largs, **kwargs):
 
 @get('/')
 def osnovna_stran():
-    dostop
     #če prijavljen/registriran potem glavna_stran.html stran sicer prijava.html
     redirect('/pohodnistvo')
 
 @get('/pohodnistvo')
 def glavna_stran():
-    dostop()
+    user = dostop()
     return rtemplate('glavna_stran.html', 
-                    naslov='Pohodništvo')
+                    naslov='Pohodništvo', user=user)
 
 @get('/o_projektu')
 def o_projektu():
-    return rtemplate('o_projektu.html')
+    user = dostop()
+    return rtemplate('o_projektu.html', naslov='O projektu', user=user)
 
 ######################################################################
 # PRIJAVA / REGISTRACIJA
@@ -269,7 +269,8 @@ def moje_drustvo():
     osebe = cur.fetchall()
 
     polozaj = int(user[1])
-    return rtemplate('moje_drustvo.html', 
+    return rtemplate('moje_drustvo.html',
+                    naslov='Moje društvo', 
                     osebe=osebe, 
                     polozaj = polozaj)
 
@@ -312,7 +313,8 @@ def dodaj_osebo():
     
     if int(user[1]) == 2:
         return rtemplate('dodaj_osebo.html', 
-                        drustvo=drustvo)
+                        drustvo=drustvo,
+                        naslov='Dodaj osebo')
     else:
         return napaka403(error)
 
@@ -515,13 +517,14 @@ def osvojena_gora_post():
 
 @get('/gore')
 def gore():
+    dostop()
     cur = baza.cursor()
     cur.execute("""
                 SELECT prvi_pristop, ime, visina, gorovje, drzava 
                 FROM gore ORDER BY ime
                 """)
     gore = cur.fetchall()
-    return rtemplate('gore.html', gore=gore)
+    return rtemplate('gore.html', gore=gore, naslov='Gore')
 
 @get('/gore/dodaj goro')
 def dodaj_goro():

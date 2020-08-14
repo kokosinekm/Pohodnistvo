@@ -1,4 +1,5 @@
-% rebase('osnovna.html', naslov=naslov)
+%setdefault('user', True)
+% rebase('osnovna.html', naslov=naslov, user=user)
 
 <h2>Uredi osebo</h2>
 <form action="{{'/osebe/uredi/' + str(oseba[0]) if defined('oseba') else '/osebe/dodaj_osebo'}}" method="post">

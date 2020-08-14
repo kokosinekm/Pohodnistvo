@@ -39,9 +39,15 @@
 
       <span class="navbar-text">
         <ul class="navbar-nav">
+          %if user == False:
+          <li>
+            <a class="nav-link" href="{{ROOT}}prijava"><b>Prijava</b></a>
+          </li>
+          %else:
           <li>
             <a class="nav-link" href="{{ROOT}}odjava"><b>Odjava</b></a>
           </li>
+          %end
         </ul>
       </span>
 
