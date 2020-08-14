@@ -240,7 +240,7 @@ def prijava_post():
         return
     if hashGesla(geslo) != hashGeslo:
         javiNapaka('Geslo ni pravilno')
-        redirect('{0}prijava')
+        redirect('{0}prijava'.format(ROOT))
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
     redirect('{0}pohodnistvo'.format(ROOT))
@@ -510,7 +510,9 @@ def osvojena_gora_post():
     cur.execute("DELETE FROM obiskane WHERE id_osebe = %s", (identiteta,))
     for gora in osvojene:
         cur.execute("INSERT INTO obiskane (id_gore, id_osebe, leto_pristopa) VALUES (%s, %s, %s)",(int(gora[0]), str(identiteta), gora[1]))
-    redirect('{0}osebe/'+str(identiteta).format(ROOT))
+    identiteta = str(identiteta)
+    pot = '{0}osebe/{1}'.format(ROOT,identiteta)
+    redirect(pot)
 
 
 ######################################################################
@@ -572,7 +574,6 @@ def dodaj_goro_post():
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
         VALUES (%s, %s, %s, %s, %s)""",
          (int(prvi_pristop), str(ime), int(visina), str(gorovje), str(drzava)))
-    pot = '{0}gore'.format(ROOT)
     redirect(pot)
 
 ######################################################################
@@ -653,6 +654,9 @@ def drustva_id(ime):
         
 ######################################################################
 # Za STATIC datoteke(slike)
+
+# Mapa za statične vire (slike, css, ...)
+static_dir = "./static"
 
 @get('/static/<filename:path>')
 def static(filename):
