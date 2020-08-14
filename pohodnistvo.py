@@ -280,7 +280,7 @@ def dodaj_osebo_drustvo():
     if int(user[1]) > 0:
         redirect('/osebe/dodaj_osebo')
     else:
-        return napaka403(error)
+        raise HTTPError(403)
 
 ######################################################################
 # OSEBE
@@ -288,33 +288,33 @@ def dodaj_osebo_drustvo():
 @get('/osebe')
 def osebe():
     user = dostop()
+    if int(user[1])!=2:
+        raise HTTPError(403)
+
     cur = baza.cursor()
     cur.execute("""
                 SELECT id, ime, priimek, spol, starost, drustvo FROM oseba
                 ORDER BY oseba.priimek""")
     osebe = cur.fetchall()
-    if int(user[1]) == 2:
-        return rtemplate('osebe.html', 
-                        osebe=osebe, 
-                        naslov='Pohodniki')
-    else:
-        return napaka403(error)
+
+    return rtemplate('osebe.html', 
+                     osebe=osebe, 
+                     naslov='Pohodniki')
 
 @get('/osebe/dodaj_osebo')
 def dodaj_osebo():
     user = dostop()
+    if int(user[1])!=2:
+        raise HTTPError(403)
     cur.execute("""
                 SELECT drustva.ime FROM drustva
                 ORDER BY drustva.ime""")
     drustvo = cur.fetchall()
     #naredimo list iz tuple
     drustvo = [x[0] for x in drustvo]
-    
-    if int(user[1]) == 2:
-        return rtemplate('dodaj_osebo.html', 
-                        drustvo=drustvo)
-    else:
-        return napaka403(error)
+
+    return rtemplate('dodaj_osebo.html', 
+                     drustvo=drustvo)
 
 @post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
@@ -338,6 +338,15 @@ def uredi_osebo(identiteta):
     cur = baza.cursor()
     response.set_cookie('identiteta',identiteta,secret=skrivnost)
 
+    #jaz je ta, ki uporablja brskalnik
+    cur.execute("""SELECT id FROM oseba 
+                WHERE uporabnik = %s""", (str(user[0]),))
+    jaz = cur.fetchone()
+
+    if identiteta != jaz and int(user[1]) != 2:
+        raise HTTPError(403)
+
+    #poiscemo drustva
     cur.execute("""SELECT drustva.ime FROM drustva ORDER BY drustva.ime""")
     drustvo = cur.fetchall()
     #naredimo list iz tupla
@@ -348,23 +357,15 @@ def uredi_osebo(identiteta):
                 FROM oseba WHERE id = %s""", (str(identiteta),))
     ime = cur.fetchone()
 
-    #jaz sem ta ki uporablja brskalnik
-    cur.execute("""SELECT id FROM oseba 
-                WHERE uporabnik = %s""", (str(user[0]),))
-    jaz = cur.fetchone()
-
     #oseba katere stran urejam
     cur.execute("""SELECT id, ime, priimek, spol, starost, drustvo 
                 FROM oseba WHERE id = %s""", (identiteta,))
     oseba = cur.fetchone()
 
-    if identiteta == jaz or int(user[1])==2:
-        return rtemplate('oseba-edit.html', 
-                        oseba=oseba, 
-                        drustvo=drustvo, 
-                        naslov="Urejanje "+ime[0]+' '+ime[1])
-    else:
-        return napaka403(error)
+    return rtemplate('oseba-edit.html', 
+                     oseba=oseba, 
+                     drustvo=drustvo, 
+                     naslov="Urejanje "+ime[0]+' '+ime[1])
 
 @post('/osebe/uredi/<identiteta>')
 def uredi_osebo_post(identiteta):
@@ -382,10 +383,10 @@ def uredi_osebo_post(identiteta):
 @post('/osebe/brisi/<identiteta>')
 def brisi_osebo(identiteta):
     user = dostop()
-    if int(user[1])==2:
-        cur.execute("DELETE FROM oseba WHERE id = %s", (identiteta,))
-    else:
-        return napaka403(error)
+    if int(user[1])!=2:
+        raise HTTPError(403)
+
+    cur.execute("DELETE FROM oseba WHERE id = %s", (identiteta,))
     redirect('/osebe')
 
 @get('/osebe/<identiteta>')
@@ -400,6 +401,10 @@ def lastnosti_osebe(identiteta):
     drustvo = cur.fetchone()
     cur.execute("SELECT drustvo FROM oseba WHERE id = %s", (identiteta,))
     drustvoID = cur.fetchone()
+
+    if drustvo != drustvoID and int(user[1])!=2:
+        raise HTTPError(403)
+
     cur.execute("""SELECT id, ime, priimek, spol, starost, drustvo 
                 FROM oseba WHERE id = %s""", (identiteta,))
     oseba = cur.fetchone()
@@ -450,17 +455,14 @@ def lastnosti_osebe(identiteta):
         vse_osvojene_gore[i].pop(0)
         vse_osvojene_gore[i].append(leto_pristopa_gora[0])
 
-    if drustvo == drustvoID or int(user[1])==2:
-        return rtemplate('oseba-id.html',  
-                        oseba=oseba, 
-                        stevilo_osvojenih_gor=stevilo_osvojenih_gor[0],
-                        najvisji_osvojen_vrh=najvisji_osvojen_vrh, 
-                        vse_osvojene_gore=vse_osvojene_gore,
-                        naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]), 
-                        identiteta=identiteta, 
-                        dodaj=dodaj)
-    else:
-        return napaka403(error)
+    return rtemplate('oseba-id.html',  
+                     oseba=oseba, 
+                     stevilo_osvojenih_gor=stevilo_osvojenih_gor[0],
+                     najvisji_osvojen_vrh=najvisji_osvojen_vrh, 
+                     vse_osvojene_gore=vse_osvojene_gore,
+                     naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]), 
+                     identiteta=identiteta, 
+                     dodaj=dodaj)
 
 @get('/osebe/dodaj goro')
 def osvojena_gora():
@@ -521,7 +523,16 @@ def gore():
                 FROM gore ORDER BY ime
                 """)
     gore = cur.fetchall()
-    return rtemplate('gore.html', gore=gore)
+
+    uporabnik = request.get_cookie("uporabnik", secret=skrivnost)
+    if uporabnik is not None:
+        cur.execute("""
+                        SELECT polozaj FROM oseba 
+                        WHERE uporabnik = %s""", (uporabnik,))
+        polozaj = (cur.fetchone())[0]
+    else:
+        polozaj = 0
+    return rtemplate('gore.html', gore=gore, pravice=polozaj)
 
 @get('/gore/dodaj goro')
 def dodaj_goro():
@@ -582,6 +593,8 @@ def drustva():
 def drustva_id(ime):
     user = dostop()
     cur = baza.cursor()
+    if int(user[1]) != 2:
+        raise HTTPError(403)
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
                 WHERE ime = %s""",(ime,))
@@ -627,16 +640,14 @@ def drustva_id(ime):
     #naredimo list iz tuple
     clani_drustva = [(x[1], x[2], x[3], x[4]) for x in clani_drustva]       
 
-    if int(user[1]) == 2:
-        return rtemplate('drustvo-id.html', 
-                        drustvo=drustvo,
-                        stevilo_clanov_drustvo=stevilo_clanov_drustvo[0],
-                        clani_drustva=clani_drustva,
-                        naslov='Društvo {0}'.format(ime), 
-                        vse = stevilo_vseh, 
-                        najvisja = najvisja_gora)
-    else:
-        return napaka403(error)
+    
+    return rtemplate('drustvo-id.html', 
+                     drustvo=drustvo,
+                     stevilo_clanov_drustvo=stevilo_clanov_drustvo[0],
+                     clani_drustva=clani_drustva,
+                     naslov='Društvo {0}'.format(ime), 
+                     vse = stevilo_vseh, 
+                     najvisja = najvisja_gora)
         
 ######################################################################
 # Za STATIC datoteke(slike)

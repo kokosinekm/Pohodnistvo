@@ -6,9 +6,11 @@
         <div class="col-4">
             <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
         </div>
-        <div class="col-4">
-            <a href="{{ROOT}}gore/dodaj goro">Dodaj goro</a>
-        </div>
+        %if pravice == 2:
+            <div class="col-4">
+                <a href="{{ROOT}}gore/dodaj goro">Dodaj goro</a>
+            </div>
+        %end
     </div>
 </form>
 
