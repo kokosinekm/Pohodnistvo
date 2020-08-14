@@ -93,7 +93,7 @@ def o_projektu():
     if polozaj:
         user = [uporabnik,polozaj[0]]
     else:
-        user = [uporabnik,None]
+        user = None
     return rtemplate('o_projektu.html', naslov='O projektu', user=user)
 
 ######################################################################
@@ -107,10 +107,12 @@ def hashGesla(s):
 
 @get('/registracija')
 def registracija_get():
+    user = request.get_cookie("uporabnik", secret=skrivnost)
     napaka = javiNapaka()
     return rtemplate('registracija.html', 
                     naslov='Registracija', 
-                    napaka = napaka)
+                    napaka = napaka,
+                    user=user)
 
 @post('/registracija')
 def registracija_post():
@@ -118,7 +120,6 @@ def registracija_post():
     identiteta = request.forms.identiteta
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-    
     iden = None
 
     try: 
@@ -161,8 +162,9 @@ def registracija_post():
 
 @get('/registracija_dodatna')
 def registracija_dodatna_get():
+    user = request.get_cookie("uporabnik", secret=skrivnost)
     javiNapaka()
-    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe')
+    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe',user=user)
 
 @post('/registracija_dodatna')
 def registracija_dodatna_post():
@@ -224,10 +226,12 @@ def registracija_dodatna_post():
 
 @get('/prijava')
 def prijava():
+    user = request.get_cookie("uporabnik", secret=skrivnost)
     napaka = javiNapaka()
     return rtemplate('prijava.html', 
                     naslov='Prijava', 
-                    napaka=napaka)
+                    napaka=napaka,
+                    user=user)
 
 @post('/prijava')
 def prijava_post():
@@ -282,7 +286,8 @@ def moje_drustvo():
     return rtemplate('moje_drustvo.html', 
                     naslov='Moje društvo',
                     osebe=osebe, 
-                    polozaj = polozaj)
+                    polozaj = polozaj,
+                    user = uporabnik)
 
 
 @get('/osebe/dodaj_osebo_drustvo')
@@ -302,7 +307,6 @@ def osebe():
     if int(user[1])!=2:
         raise HTTPError(403)
 
-    
     cur.execute("""
                 SELECT id, ime, priimek, spol, starost, drustvo FROM oseba
                 ORDER BY oseba.priimek""")
@@ -310,7 +314,8 @@ def osebe():
 
     return rtemplate('osebe.html', 
                      osebe=osebe, 
-                     naslov='Pohodniki')
+                     naslov='Pohodniki',
+                     user=user[0])
 
 @get('/osebe/dodaj_osebo')
 def dodaj_osebo():
@@ -326,7 +331,8 @@ def dodaj_osebo():
 
     return rtemplate('dodaj_osebo.html', 
                      drustvo=drustvo,
-                     naslov='Dodaj osebo')
+                     naslov='Dodaj osebo',
+                     user=user[0])
 
 @post('/osebe/dodaj_osebo')
 def dodaj_osebo_post():
@@ -377,7 +383,8 @@ def uredi_osebo(identiteta):
     return rtemplate('oseba-edit.html', 
                      oseba=oseba, 
                      drustvo=drustvo, 
-                     naslov="Urejanje "+ime[0]+' '+ime[1])
+                     naslov="Urejanje "+ime[0]+' '+ime[1],
+                     user=user[0])
 
 @post('/osebe/uredi/<identiteta>')
 def uredi_osebo_post(identiteta):
@@ -474,18 +481,20 @@ def lastnosti_osebe(identiteta):
                      vse_osvojene_gore=vse_osvojene_gore,
                      naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]), 
                      identiteta=identiteta, 
-                     dodaj=dodaj)
+                     dodaj=dodaj,
+                     user=user[0])
 
 @get('/osebe/dodaj goro')
 def osvojena_gora():
-    dostop()
+    user=dostop()
     
     cur.execute("""SELECT id, prvi_pristop, ime, visina, gorovje, drzava 
                 FROM gore ORDER BY ime""")
     gore = cur.fetchall()
     return rtemplate('dodaj_osvojeno_goro.html', 
                     gore=gore, 
-                    naslov='Nov osvojen hrib')
+                    naslov='Nov osvojen hrib',
+                    user=user[0])
 
 @post('/osebe/dodaj goro')
 def osvojena_gora_post():
@@ -545,11 +554,11 @@ def gore():
         polozaj = (cur.fetchone())[0]
     else:
         polozaj = 0
-    return rtemplate('gore.html', gore=gore, pravice=polozaj, naslov='Gore')
+    return rtemplate('gore.html', gore=gore, pravice=polozaj, naslov='Gore', user = uporabnik)
 
 @get('/gore/dodaj goro')
 def dodaj_goro():
-    dostop()
+    user=dostop()
     
     cur.execute("""
                 SELECT gorovje.ime FROM gorovje
@@ -569,7 +578,8 @@ def dodaj_goro():
     return rtemplate('dodaj_goro.html', 
                     gorovje=gorovje, 
                     drzave=drzave, 
-                    naslov='Dodaj goro')
+                    naslov='Dodaj goro',
+                    user=user[0])
 
 @post('/gore/dodaj goro')
 def dodaj_goro_post():
@@ -591,7 +601,7 @@ def dodaj_goro_post():
 
 @get('/drustva')
 def drustva():
-    dostop()
+    user=dostop()
     
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
@@ -600,11 +610,12 @@ def drustva():
     drustva = cur.fetchall()
     return rtemplate('drustva.html', 
                     drustva=drustva, 
-                    naslov='Društva')
+                    naslov='Društva',
+                    user=user[0])
 
 @get('/drustva/<ime>')
 def drustva_id(ime):
-    dostop()
+    user=dostop()
     
     cur.execute("""
                 SELECT id, ime, leto_ustanovitve FROM drustva
@@ -658,7 +669,8 @@ def drustva_id(ime):
                      clani_drustva=clani_drustva,
                      naslov='Društvo {0}'.format(ime), 
                      vse = stevilo_vseh, 
-                     najvisja = najvisja_gora)
+                     najvisja = najvisja_gora,
+                     user=user[0])
         
 ######################################################################
 # Za STATIC datoteke(slike)
