@@ -49,6 +49,15 @@ def javiNapaka(napaka = None):
         response.set_cookie('napaka', napaka, path="/", secret=skrivnost)
     return sporocilo
 
+def javiNapaka2(napaka = None):
+    sporocilo = request.get_cookie("napaka2", secret=skrivnost)
+    if napaka is None:
+        response.delete_cookie('napaka2')
+    else:
+        #path doloca za katere domene naj bo napaka, default je cela domena
+        response.set_cookie('napaka2', napaka, path="/", secret=skrivnost)
+    return sporocilo
+
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
 
 def dostop():
@@ -153,6 +162,14 @@ def registracija_post():
         redirect('{0}registracija'.format(ROOT))
         return
 
+    zgostitev = hashGesla(geslo)
+    #brez str() ima lahko težave s tipom podatkov
+    cur.execute("UPDATE oseba SET uporabnik = %s, geslo = %s, polozaj = %s WHERE id = %s", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
+    #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
+    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
+    redirect('{0}pohodnistvo'.format(ROOT))
+
+
 @get('/registracija_dodatna')
 def registracija_dodatna_get():
     napaka = javiNapaka()
@@ -170,13 +187,6 @@ def registracija_dodatna_post():
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
     cur = baza.cursor()
-
-
-    if identiteta is None:
-        #id je None
-        javiNapaka(napaka="Neveljavno izbrana identiteta")
-        redirect('/registracija_dodatna')
-        return
 
     if isinstance(identiteta, int):
         #id ni število
@@ -197,18 +207,6 @@ def registracija_dodatna_post():
         redirect('/registracija_dodatna')
         return
 
-    if ime is None:
-        #id je None
-        javiNapaka(napaka="Neveljavno izbrano ime.")
-        redirect('/registracija_dodatna')
-        return
-
-    if priimek is None:
-        #id je None
-        javiNapaka(napaka="Neveljavno izbran priimek.")
-        redirect('/registracija_dodatna')
-        return
-
     if len(geslo)<4:
         #dolzina gesla
         javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
@@ -222,7 +220,6 @@ def registracija_dodatna_post():
         redirect('/registracija_dodatna')
         return
 
-    polozaj = randint(1, 3)
     zgostitev = hashGesla(geslo)
     #brez str() ima lahko težave s tipom podatkov
     cur.execute("UPDATE oseba SET uporabnik = %s, geslo = %s, polozaj = %s WHERE id = %s", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
@@ -333,6 +330,8 @@ def prijava_post():
 def odjava():
     response.delete_cookie('uporabnik')
     response.delete_cookie('identiteta')
+    response.delete_cookie('napaka')
+    response.delete_cookie('napaka2')
     redirect('{0}prijava'.format(ROOT))
     
 ######################################################################
@@ -593,8 +592,7 @@ def osvojena_gora_post():
     for gora in osvojene:
         cur.execute("INSERT INTO obiskane (id_gore, id_osebe, leto_pristopa) VALUES (%s, %s, %s)",(int(gora[0]), str(identiteta), gora[1]))
     identiteta = str(identiteta)
-    pot = '{0}osebe/{1}'.format(ROOT,identiteta)
-    redirect(pot)
+    redirect('{0}osebe/{1}'.format(ROOT,identiteta))
 
 @get('/osebe/brisi goro')
 def brisi_goro():
@@ -656,6 +654,7 @@ def gore():
 @get('/gore/dodaj goro')
 def dodaj_goro():
     user=dostop()
+    javiNapaka2()
     
     cur.execute("""
                 SELECT gorovje.ime FROM gorovje
@@ -672,11 +671,14 @@ def dodaj_goro():
     drzave = cur.fetchall()
     drzave = [y[0] for y in drzave]
 
+    napaka = request.get_cookie('napaka2',secret=skrivnost)
+
     return rtemplate('dodaj_goro.html', 
                     gorovje=gorovje, 
                     drzave=drzave, 
                     naslov='Dodaj goro',
-                    user=user[0])
+                    user=user[0],
+                    napaka=napaka)
 
 @post('/gore/dodaj goro')
 def dodaj_goro_post():
@@ -686,12 +688,22 @@ def dodaj_goro_post():
     drzava = request.forms.get('drzava')
     gorovje = request.forms.get('gorovje')
 
-    
+    if int(visina)>8886:
+        javiNapaka2("Vnešena višina je nezemeljska!")
+        redirect('{0}gore/dodaj goro'.format(ROOT))
+        return
 
+    time = datetime.datetime.now()
+    leto = int(time.year)
+    if int(prvi_pristop)>leto:
+        javiNapaka2("To leto je v prihodnosti!")
+        redirect('{0}gore/dodaj goro'.format(ROOT))
+        return
+    
     cur.execute("""INSERT INTO gore (prvi_pristop, ime, visina, gorovje, drzava)
         VALUES (%s, %s, %s, %s, %s)""",
          (int(prvi_pristop), str(ime), int(visina), str(gorovje), str(drzava)))
-    redirect(pot)
+    redirect('{0}gore'.format(ROOT))
 
 ######################################################################
 # DRUSTVA
