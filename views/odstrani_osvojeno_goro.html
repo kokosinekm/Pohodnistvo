@@ -1,0 +1,50 @@
+%setdefault('user', True)
+% rebase('osnovna.html', naslov=naslov)
+
+<h2>Lažnivec!</h2>
+<p>V spodnjem oknu lahko poiščeš goro za katero si rekel, da si jo obiskal! <b>Nisem obiskal/a</b>.</p>
+<form>
+    <div class="form-row">
+        <div class="col-4">
+            <input type="text" id="vnos_iskanja" class="form-control" onkeyup="funkcija_iskanja_po_tabeli()" placeholder="Išči...">
+        </div>
+    </div>
+</form>
+
+<form action="{{ROOT}}osebe/brisi goro" method="POST">
+    <div class="col-4">
+        <button type="submit" class="btn btn-primary">Odstrani</button>
+    </div> <br>
+<table class="table table-striped" id="tabela">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Ime</th>
+            <th scope="col">Višina</th>
+            <th scope="col">Gorovje</th>
+            <th scope="col">Država</th>
+            <th scope="col">Nisem obiskal/a</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        %for (id, prvi_pristop, ime, visina, gorovje, drzava) in gore:
+        <tr>
+            <td>{{ime}}</td>
+            <td>{{visina}}</td>
+            <td>{{gorovje}}</td>
+            <td>{{drzava}}</td>
+            <td>
+                <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" name= {{id}} value = {{id}}>
+                </div>
+            </td>
+          </tr>
+        %end
+    </tbody>
+
+</table>
+
+<div class="col-4">
+    <button type="submit" class="btn btn-primary">Odstrani</button>
+</div>
+</form>

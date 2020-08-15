@@ -509,19 +509,22 @@ def lastnosti_osebe(identiteta):
 
     #najvisji osvojen vrh
     cur.execute("""
-                SELECT visina, ime FROM gore 
-                JOIN obiskane ON id = id_gore
-                WHERE id=%s
-                ORDER BY gore.visina
-                DESC LIMIT 1""", (identiteta,))
-    najvisji_osvojen_vrh = cur.fetchone()
-    if najvisji_osvojen_vrh is None:
-        najvisji_osvojen_vrh = (None, None)
+                SELECT visina, ime FROM gore WHERE 
+                id IN (SELECT id_gore FROM obiskane 
+                WHERE id_osebe = %s) ORDER BY visina""", (identiteta,))
+    najvisji_osvojen_vrh = cur.fetchall()
+
+    najvisja_gora = [0,None]
+    if najvisji_osvojen_vrh != []:
+        najvisji_osvojen_vrh = najvisji_osvojen_vrh[-1]
+        if najvisji_osvojen_vrh[1] is not None and najvisji_osvojen_vrh[0] is not None:
+            if najvisja_gora[0] <= najvisji_osvojen_vrh[0]:
+                najvisja_gora = najvisji_osvojen_vrh
 
     #stevilo gora, na katerih je bil pohodnik
     cur.execute("""
                 SELECT COUNT(id_gore) FROM obiskane
-                WHERE id_osebe = %s""", (identiteta,))
+                WHERE id_osebe = %s""", (str(identiteta),))
     stevilo_osvojenih_gor = cur.fetchone()
 
     #vse gore na katerih je bil/bila
@@ -530,13 +533,13 @@ def lastnosti_osebe(identiteta):
                  JOIN obiskane ON id = id_gore
                  WHERE id_osebe = %s
                  ORDER BY ime
-                 """, (identiteta, )) 
+                 """, (str(identiteta), )) 
     vse_osvojene_gore = cur.fetchall() 
 
     return rtemplate('oseba-id.html',  
                      oseba=oseba, 
                      stevilo_osvojenih_gor=stevilo_osvojenih_gor[0],
-                     najvisji_osvojen_vrh=najvisji_osvojen_vrh, 
+                     najvisji_osvojen_vrh=najvisja_gora, 
                      vse_osvojene_gore=vse_osvojene_gore,
                      naslov='Pohodnik {0} {1}'.format(oseba[1], oseba[2]), 
                      identiteta=identiteta, 
@@ -593,7 +596,42 @@ def osvojena_gora_post():
     pot = '{0}osebe/{1}'.format(ROOT,identiteta)
     redirect(pot)
 
+@get('/osebe/brisi goro')
+def brisi_goro():
+    user=dostop()
 
+    identiteta = request.get_cookie('identiteta', secret=skrivnost)
+
+    cur.execute(""" 
+                 SELECT id, prvi_pristop, ime, visina, gorovje, drzava  FROM gore
+                 JOIN obiskane ON id = id_gore
+                 WHERE id_osebe = %s
+                 ORDER BY ime
+                 """, (identiteta, )) 
+    gore = cur.fetchall()
+    return rtemplate('odstrani_osvojeno_goro.html', 
+                    gore=gore, 
+                    naslov='Zlagan dosežek',
+                    user=user[0])
+
+@post('/osebe/brisi goro')
+def brisi_goro_post():
+
+    identiteta = request.get_cookie('identiteta', secret=skrivnost)
+
+    cur.execute("SELECT id_gore, leto_pristopa FROM obiskane WHERE id_osebe = %s",(identiteta,))
+    j = cur.fetchall()
+
+
+    for id_gore in j:
+        #pogledamo katere id-je smo obkljukali
+        i = request.forms.get(str(id_gore[0]))
+        cur.execute("DELETE FROM obiskane WHERE id_osebe = %s and id_gore = %s", (identiteta, i, ))
+    
+
+    identiteta = str(identiteta)
+    pot = '{0}osebe/{1}'.format(ROOT,identiteta)
+    redirect(pot)
 ######################################################################
 # GORE
 
