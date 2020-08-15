@@ -58,15 +58,6 @@ def javiNapaka2(napaka = None):
         response.set_cookie('napaka2', napaka, path="/", secret=skrivnost)
     return sporocilo
 
-def javiNapaka3(napaka = None):
-    sporocilo = request.get_cookie('napaka3', secret=skrivnost)
-    if napaka is None:
-        response.delete_cookie('napaka3')
-    else:
-        #path doloca za katere domene naj bo napaka, default je cela domena
-        response.set_cookie('napaka3', napaka, path="/", secret=skrivnost)
-    return sporocilo
-
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
 
 def dostop():
@@ -182,12 +173,8 @@ def registracija_post():
 @get('/registracija_dodatna')
 def registracija_dodatna_get():
     user = request.get_cookie("uporabnik", secret=skrivnost)
-    cookie_napaka = request.get_cookie('napaka', secret=skrivnost)
-    if cookie_napaka=="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi":
-        napaka = "Nisi (še) član društva, zato tvoj ID ne obstaja v bazi"
-    else:
-        napaka = javiNapaka()
-    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe',napaka=napaka,user=user)
+    javiNapaka()
+    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe',user=user)
 
 @post('/registracija_dodatna')
 def registracija_dodatna_post():
@@ -200,12 +187,6 @@ def registracija_dodatna_post():
     drustvo = request.forms.drustva
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-
-    if isinstance(identiteta, int):
-        #id ni število
-        javiNapaka(napaka="Identiteta ni število")
-        redirect('{0}registracija_dodatna'.format(ROOT))
-        return
 
     if len(identiteta)>4:
         #id je predolga
@@ -250,7 +231,7 @@ def registracija_dodatna_post():
 @get('/prijava')
 def prijava():
     
-    napaka = javiNapaka3()
+    napaka = javiNapaka()
     user = request.get_cookie("uporabnik", secret=skrivnost)
 
     return rtemplate('prijava.html', 
@@ -273,11 +254,11 @@ def prijava_post():
     except:
         hashGeslo = None
     if hashGeslo is None:
-        javiNapaka3('Niste še registrirani')
+        javiNapaka('Niste še registrirani')
         redirect('{0}prijava'.format(ROOT))
         return
     if hashGesla(geslo) != hashGeslo:
-        javiNapaka3('Geslo ni pravilno')
+        javiNapaka('Geslo ni pravilno')
         redirect('{0}prijava'.format(ROOT))
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
