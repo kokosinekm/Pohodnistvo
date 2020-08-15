@@ -41,7 +41,7 @@ def napaka403(error):
 
 
 def javiNapaka(napaka = None):
-    sporocilo = request.get_cookie("napaka", secret=skrivnost)
+    sporocilo = request.get_cookie('napaka', secret=skrivnost)
     if napaka is None:
         response.delete_cookie('napaka')
     else:
@@ -50,12 +50,21 @@ def javiNapaka(napaka = None):
     return sporocilo
 
 def javiNapaka2(napaka = None):
-    sporocilo = request.get_cookie("napaka2", secret=skrivnost)
+    sporocilo = request.get_cookie('napaka2', secret=skrivnost)
     if napaka is None:
         response.delete_cookie('napaka2')
     else:
         #path doloca za katere domene naj bo napaka, default je cela domena
         response.set_cookie('napaka2', napaka, path="/", secret=skrivnost)
+    return sporocilo
+
+def javiNapaka3(napaka = None):
+    sporocilo = request.get_cookie('napaka3', secret=skrivnost)
+    if napaka is None:
+        response.delete_cookie('napaka3')
+    else:
+        #path doloca za katere domene naj bo napaka, default je cela domena
+        response.set_cookie('napaka3', napaka, path="/", secret=skrivnost)
     return sporocilo
 
 skrivnost = "NekaVelikaDolgaSmesnaStvar"
@@ -141,13 +150,13 @@ def registracija_post():
 
     if iden is None:
         #id ne obstaja, ni član društva
-        javiNapaka(napaka="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi")
+        javiNapaka("Nisi (še) član društva, zato tvoj ID ne obstaja v bazi")
         redirect('{0}registracija_dodatna'.format(ROOT))
         return
 
     if len(geslo)<4:
         #dolzina gesla
-        javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
+        javiNapaka("Geslo prekratko. Dolžina gesla mora biti vsaj 5")
         redirect('{0}registracija'.format(ROOT))
         return
 
@@ -158,7 +167,7 @@ def registracija_post():
     identiteta2 = cur.fetchone()
     if identiteta2 != None and identiteta != identiteta2:
         #enolicnost uporabnikov
-        javiNapaka(napaka="To uporabniško ime je zasedeno")
+        javiNapaka("To uporabniško ime je zasedeno")
         redirect('{0}registracija'.format(ROOT))
         return
 
@@ -172,66 +181,13 @@ def registracija_post():
 
 @get('/registracija_dodatna')
 def registracija_dodatna_get():
-    napaka = javiNapaka()
-    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe')
-
-@post('/registracija_dodatna')
-def registracija_dodatna_post():
-    #poberimo dodatne vnesene podatke
-    identiteta = request.forms.identiteta
-    ime = request.forms.ime
-    priimek = request.forms.priimek
-    starost = request.forms.starost
-    spol = request.forms.spol
-    drustvo = request.forms.drustvo
-    uporabnik = request.forms.uporabnik
-    geslo = request.forms.geslo
-    cur = baza.cursor()
-
-    if isinstance(identiteta, int):
-        #id ni število
-        javiNapaka(napaka="Identiteta ni število")
-        redirect('/registracija_dodatna')
-        return
-
-    if len(identiteta)>4:
-        #id je predolga
-        javiNapaka(napaka="Identiteta predolga.")
-        redirect('/registracija_dodatna')
-        return
-
-    identitete_veljavne = cur.execute("SELECT id FROM oseba").fetchall()
-    if identiteta in identitete_veljavne:
-        #id je že zasedena
-        javiNapaka(napaka="Izbrana identiteta je že zasedena")
-        redirect('/registracija_dodatna')
-        return
-
-    if len(geslo)<4:
-        #dolzina gesla
-        javiNapaka(napaka="Geslo prekratko. Dolžina gesla mora biti vsaj 5")
-        redirect('/registracija_dodatna')
-        return
-
-    identiteta_ze_registriranih = cur.execute("SELECT uporabnik FROM oseba").fetchall()
-    if  uporabnik in identiteta_ze_registriranih:
-        #enolicnost uporabnikov
-        javiNapaka(napaka="To uporabniško ime je zasedeno")
-        redirect('/registracija_dodatna')
-        return
-
-    zgostitev = hashGesla(geslo)
-    #brez str() ima lahko težave s tipom podatkov
-    cur.execute("UPDATE oseba SET uporabnik = %s, geslo = %s, polozaj = %s WHERE id = %s", (str(uporabnik), str(zgostitev), 0, str(identiteta)))
-    #dolocimo osebo ki uporablja brskalnik (z njo dolocimo cookie)
-    response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
-    redirect('{0}pohodnistvo'.format(ROOT))
-
-@get('/registracija_dodatna')
-def registracija_dodatna_get():
     user = request.get_cookie("uporabnik", secret=skrivnost)
-    javiNapaka()
-    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe',user=user)
+    cookie_napaka = request.get_cookie('napaka', secret=skrivnost)
+    if cookie_napaka=="Nisi (še) član društva, zato tvoj ID ne obstaja v bazi":
+        napaka = "Nisi (še) član društva, zato tvoj ID ne obstaja v bazi"
+    else:
+        napaka = javiNapaka()
+    return rtemplate('registracija_dodatna.html', naslov='Registracija nove osebe',napaka=napaka,user=user)
 
 @post('/registracija_dodatna')
 def registracija_dodatna_post():
@@ -244,7 +200,6 @@ def registracija_dodatna_post():
     drustvo = request.forms.drustva
     uporabnik = request.forms.uporabnik
     geslo = request.forms.geslo
-    
 
     if isinstance(identiteta, int):
         #id ni število
@@ -294,8 +249,10 @@ def registracija_dodatna_post():
 
 @get('/prijava')
 def prijava():
+    
+    napaka = javiNapaka3()
     user = request.get_cookie("uporabnik", secret=skrivnost)
-    napaka = javiNapaka()
+
     return rtemplate('prijava.html', 
                     naslov='Prijava', 
                     napaka=napaka,
@@ -316,11 +273,11 @@ def prijava_post():
     except:
         hashGeslo = None
     if hashGeslo is None:
-        javiNapaka('Niste še registrirani')
+        javiNapaka3('Niste še registrirani')
         redirect('{0}prijava'.format(ROOT))
         return
     if hashGesla(geslo) != hashGeslo:
-        javiNapaka('Geslo ni pravilno')
+        javiNapaka3('Geslo ni pravilno')
         redirect('{0}prijava'.format(ROOT))
         return
     response.set_cookie('uporabnik', uporabnik, secret=skrivnost)
@@ -420,7 +377,7 @@ def dodaj_osebo_post():
                 VALUES (%s, %s, %s, %s, %s)""", (ime, priimek, spol, starost, drustvo))
     redirect('{0}osebe'.format(ROOT))
 
-@get('/osebe/uredi/<identiteta>')
+@get('/osebe/uredi/<identiteta:int>')
 def uredi_osebo(identiteta):
     user = dostop()
     response.set_cookie('identiteta',identiteta,secret=skrivnost)
@@ -455,7 +412,7 @@ def uredi_osebo(identiteta):
                      naslov="Urejanje "+ime[0]+' '+ime[1],
                      user=user[0])
 
-@post('/osebe/uredi/<identiteta>')
+@post('/osebe/uredi/<identiteta:int>')
 def uredi_osebo_post(identiteta):
     ime = request.forms.get('ime')
     priimek = request.forms.get('priimek')
@@ -468,7 +425,7 @@ def uredi_osebo_post(identiteta):
     redirect('{0}moje_drustvo'.format(ROOT))
 
 
-@post('/osebe/brisi/<identiteta>')
+@post('/osebe/brisi/<identiteta:int>')
 def brisi_osebo(identiteta):
     user = dostop()
     if int(user[1])!=2:
@@ -477,7 +434,7 @@ def brisi_osebo(identiteta):
     cur.execute("DELETE FROM oseba WHERE id = %s", (identiteta,))
     redirect('{0}osebe'.format(ROOT))
 
-@get('/osebe/<identiteta>')
+@get('/osebe/<identiteta:int>')
 def lastnosti_osebe(identiteta):
     user = dostop()
     #dolocim identiteto osebe, kjer bom brskal (admin ni nujno enak identiteti kjer ureja)
