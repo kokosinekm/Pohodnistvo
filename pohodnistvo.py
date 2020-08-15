@@ -431,7 +431,7 @@ def uredi_osebo(identiteta):
                 WHERE uporabnik = %s""", (str(user[0]),))
     jaz = cur.fetchone()
 
-    if identiteta != jaz:
+    if identiteta != jaz and int(user[1]) != 2:
         raise HTTPError(403)
 
     #poiscemo drustva
@@ -501,9 +501,10 @@ def lastnosti_osebe(identiteta):
     #ta ki lahko dodaja hribe v tabelo obiskani za določenega posameznika je admin in oseba sama
     cur.execute("SELECT id FROM oseba WHERE uporabnik = %s", (str(user[0]),))
     jaz = cur.fetchone()
+
     #to preverim s spremenljivko dodaj, ki je true kadar lahko dodam
     dodaj = False
-    if jaz[0] == identiteta or user[1]==2:
+    if jaz[0] == int(identiteta) or user[1]==2:
         dodaj = True
 
     #najvisji osvojen vrh
